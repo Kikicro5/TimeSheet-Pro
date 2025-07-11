@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useContext } from 'react';
 import type { TimeEntry, OvertimeOption } from '@/types';
 import { TimesheetForm } from '@/components/timesheet-form';
 import { TimesheetList } from '@/components/timesheet-list';
-import { PiggyBank, History } from 'lucide-react';
+import { PiggyBank, History, Briefcase } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -127,8 +127,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="bg-primary text-primary-foreground shadow-md">
-        <div className="w-full sm:container sm:mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center gap-2">
-          <h1 className="text-xl sm:text-2xl font-bold font-headline whitespace-nowrap">TimeSheet Pro</h1>
+        <div className="w-full px-4 sm:container sm:mx-auto sm:px-6 lg:px-8 py-4 flex justify-between items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Briefcase className="h-6 w-6" />
+            <h1 className="text-xl sm:text-2xl font-bold font-headline whitespace-nowrap">TimeSheet Pro</h1>
+          </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
              {isClient && (
                 <div className="hidden sm:flex items-center gap-2 text-lg">
@@ -138,10 +141,10 @@ export default function Home() {
                   </span>
                 </div>
              )}
-             <Button asChild variant="outline" size="icon" className="sm:h-9 sm:w-auto sm:px-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                <Link href="/history">
+             <Button asChild variant="outline" className="h-9 px-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                <Link href="/history" className="flex items-center">
                     <History className="h-4 w-4" />
-                    <span className="hidden sm:inline-block sm:ml-2">{t.history}</span>
+                    <span className="ml-2">{t.history}</span>
                 </Link>
              </Button>
              <LanguageSwitcher />

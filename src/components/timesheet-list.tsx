@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useContext, useState } from 'react';
+import { useMemo, useRef, useContext, useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { TimeEntry, OvertimeOption, DownloadHistoryEntry, Job } from '@/types';
@@ -121,17 +121,25 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
     
     setPdfData({ entries: jobEntries, summary: jobSummary, job: job });
     
-    setTimeout(() => {
-        if (pdfGeneratorRef.current) {
-            if (action === 'export') {
-                pdfGeneratorRef.current.handleExportPDF();
-            } else {
-                pdfGeneratorRef.current.handleShare();
-            }
-            addDownloadToHistory(job);
-        }
-    }, 100); // Timeout to allow state to update and re-render PDF generator
+    // The useEffect below will handle the execution
   }
+
+  useEffect(() => {
+    if (pdfData && pdfGeneratorRef.current) {
+      // Find the action from a button that might have triggered this
+      const action = (window as any)._pdfAction;
+      if (action === 'export') {
+        pdfGeneratorRef.current.handleExportPDF();
+      } else if (action === 'share') {
+        pdfGeneratorRef.current.handleShare();
+      }
+      addDownloadToHistory(pdfData.job);
+      
+      // Clean up
+      setPdfData(null); 
+      delete (window as any)._pdfAction;
+    }
+  }, [pdfData]);
 
 
   if (entries.length === 0) {
@@ -150,6 +158,11 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
   
   const hasJob1Entries = monthlyEntries.some(e => e.job === 'job1');
   const hasJob2Entries = monthlyEntries.some(e => e.job === 'job2');
+  
+  const handleActionClick = (action: 'export' | 'share', job: Job) => {
+      (window as any)._pdfAction = action;
+      prepareAndExecute(action, job);
+  }
 
   return (
     <>
@@ -168,10 +181,10 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => prepareAndExecute('export', 'job1')} disabled={!hasJob1Entries}>
+                <DropdownMenuItem onClick={() => handleActionClick('export', 'job1')} disabled={!hasJob1Entries}>
                   {t.exportFor} {t.job1}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => prepareAndExecute('export', 'job2')} disabled={!hasJob2Entries}>
+                <DropdownMenuItem onClick={() => handleActionClick('export', 'job2')} disabled={!hasJob2Entries}>
                   {t.exportFor} {t.job2}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -186,10 +199,10 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => prepareAndExecute('share', 'job1')} disabled={!hasJob1Entries}>
+                  <DropdownMenuItem onClick={() => handleActionClick('share', 'job1')} disabled={!hasJob1Entries}>
                      {t.shareFor} {t.job1}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => prepareAndExecute('share', 'job2')} disabled={!hasJob2Entries}>
+                  <DropdownMenuItem onClick={() => handleActionClick('share', 'job2')} disabled={!hasJob2Entries}>
                      {t.shareFor} {t.job2}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -320,7 +333,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
         userName={userName}
         monthName={monthName}
         monthlyEntries={pdfData?.entries || []}
-        monthlySummary={pdfData?.summary || {}}
+        monthlySummary={pdfData?.summary || { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 }}
         overtimeOption={overtimeOption}
         job={pdfData?.job}
     />

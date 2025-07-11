@@ -127,7 +127,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="bg-primary text-primary-foreground shadow-md">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center gap-4">
           <h1 className="text-2xl font-bold font-headline">TimeSheet Pro</h1>
           <div className="flex items-center gap-4">
              {isClient && (

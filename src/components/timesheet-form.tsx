@@ -162,7 +162,13 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
                                 jobColors[job],
                                 jobTextColors[job]
                             )}>
-                              {t[job]}
+                              <div className="flex items-center justify-center gap-2">
+                                <span className={cn(
+                                    "h-3 w-3 rounded-full transition-colors",
+                                    field.value === job ? 'bg-green-500' : 'bg-gray-300'
+                                )}></span>
+                                {t[job]}
+                              </div>
                             </FormLabel>
                           </FormItem>
                       ))}

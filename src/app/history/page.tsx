@@ -23,7 +23,6 @@ import {
 import { PdfGenerator } from '@/components/pdf-generator';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
-import { LanguageSwitcher } from '@/components/language-switcher';
 
 interface HistoryPdfGeneratorHandles {
     handleExportPDF: () => void;
@@ -88,7 +87,7 @@ export default function HistoryPage() {
                 </Link>
             </Button>
             <h1 className="text-2xl font-bold font-headline">{t.downloadHistory}</h1>
-            <LanguageSwitcher />
+            <div className="w-12"></div> {/* Placeholder for alignment */}
         </div>
       </header>
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">

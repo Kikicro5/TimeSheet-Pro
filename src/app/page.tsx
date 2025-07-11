@@ -151,7 +151,7 @@ export default function Home() {
       (acc, entry) => {
         if (entry.isVacation) {
           acc.vacationDays += 1;
-        } else if (!entry.isHoliday) {
+        } else if (!entry.isHoliday && entry.job === 'job1') { // Only count overtime for job1
           acc.totalOvertime += (entry.overtimeHours || 0);
         }
         return acc;
@@ -159,6 +159,7 @@ export default function Home() {
       { totalOvertime: 0, vacationDays: 0 }
     );
   }, [entries, isClient]);
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">

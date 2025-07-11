@@ -8,14 +8,16 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Plane, PartyPopper, User } from 'lucide-react';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
+import type { Job } from '@/types';
 
 const formSchema = z.object({
   userName: z.string().min(1, 'Ime i prezime je obavezno.'),
@@ -24,6 +26,7 @@ const formSchema = z.object({
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:mm)'),
   pause: z.coerce.number().min(0, 'Pause cannot be negative.'),
   location: z.string().min(1, 'Location is required.'),
+  job: z.enum(['job1', 'job2', 'job3'], { required_error: "You need to select a job." }),
 });
 
 type TimesheetFormValues = z.infer<typeof formSchema>;
@@ -33,6 +36,19 @@ interface TimesheetFormProps {
   userName: string;
   setUserName: (name: string) => void;
 }
+
+const jobColors: Record<Job, string> = {
+    job1: 'bg-blue-100 hover:bg-blue-200 border-blue-200',
+    job2: 'bg-green-100 hover:bg-green-200 border-green-200',
+    job3: 'bg-amber-100 hover:bg-amber-200 border-amber-200',
+};
+
+const jobTextColors: Record<Job, string> = {
+    job1: 'text-blue-800',
+    job2: 'text-green-800',
+    job3: 'text-amber-800',
+};
+
 
 export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetFormProps) {
   const { toast } = useToast();
@@ -48,6 +64,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
       endTime: '16:00',
       pause: 60,
       location: '',
+      job: 'job1',
     },
   });
 
@@ -61,7 +78,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
     addEntry(entryData);
     toast({
         title: t.entryAdded,
-        description: `${t.workOn} ${format(data.date, 'PPP')} ${t.hasBeenLogged}.`,
+        description: `${t.workOn} ${format(data.date, 'PPP')} ${t.for} ${t[data.job]} ${t.hasBeenLogged}.`,
     })
     form.reset({
         ...data,
@@ -70,11 +87,12 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
         endTime: '16:00',
         pause: 60,
         location: '', 
+        job: 'job1',
     });
   }
 
   const handleAddSpecialDay = (isVacation: boolean) => {
-    const { date, userName } = form.getValues();
+    const { date, userName, job } = form.getValues();
     if (!date) {
         toast({ variant: 'destructive', title: t.error, description: t.pleaseSelectDate });
         return;
@@ -86,6 +104,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
         endTime: '',
         pause: 0,
         location: '',
+        job: job,
         isVacation: isVacation,
         isHoliday: !isVacation
     });
@@ -97,9 +116,11 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
 
   return (
     <Card className="w-full shadow-lg animate-in fade-in-50">
-      <CardHeader>
-        <CardTitle className="text-2xl font-headline">{t.newTimeEntry}</CardTitle>
-        <CardDescription>{t.fillInWorkDetails}</CardDescription>
+      <CardHeader className="flex-row justify-between items-center">
+        <div>
+          <CardTitle className="text-2xl font-headline">{t.newTimeEntry}</CardTitle>
+          <CardDescription>{t.fillInWorkDetails}</CardDescription>
+        </div>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -116,6 +137,39 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
                       <Input placeholder={t.namePlaceholder} className="pl-10" {...field} />
                     </FormControl>
                   </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="job"
+              render={({ field }) => (
+                <FormItem className="sm:col-span-2 lg:col-span-3">
+                  <FormLabel>{t.job}</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="grid grid-cols-3 gap-4"
+                    >
+                      {(['job1', 'job2', 'job3'] as Job[]).map((job) => (
+                          <FormItem key={job} className="flex-1">
+                            <FormControl>
+                              <RadioGroupItem value={job} className="sr-only" />
+                            </FormControl>
+                            <FormLabel className={cn(
+                                "flex flex-col items-center justify-center rounded-md border-2 p-4 font-normal cursor-pointer transition-colors",
+                                field.value === job ? "border-primary" : "border-transparent",
+                                jobColors[job],
+                                jobTextColors[job]
+                            )}>
+                              {t[job]}
+                            </FormLabel>
+                          </FormItem>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

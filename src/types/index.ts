@@ -1,3 +1,5 @@
+export type Job = 'job1' | 'job2' | 'job3';
+
 export interface TimeEntry {
   id: string;
   date: Date;
@@ -5,6 +7,7 @@ export interface TimeEntry {
   endTime: string;
   pause: number; // in minutes
   location: string;
+  job: Job;
   totalHours: number;
   overtimeHours: number;
   isVacation?: boolean;

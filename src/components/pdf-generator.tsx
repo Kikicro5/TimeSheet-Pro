@@ -4,7 +4,7 @@ import { useRef, forwardRef, useImperativeHandle, useContext } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { format } from 'date-fns';
-import { TimeEntry, OvertimeOption } from '@/types';
+import { TimeEntry, OvertimeOption, Job } from '@/types';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
 
@@ -21,6 +21,12 @@ interface PdfGeneratorProps {
   };
   overtimeOption: OvertimeOption;
 }
+
+const jobColors: Record<Job, string> = {
+    job1: '#e0f2fe', // blue-100
+    job2: '#dcfce7', // green-100
+    job3: '#fef3c7', // amber-100
+};
 
 export const PdfGenerator = forwardRef(({
   userName,
@@ -111,6 +117,7 @@ export const PdfGenerator = forwardRef(({
         <thead>
           <tr className="bg-gray-200">
             <th className="border border-gray-300 p-1 align-middle">{t.date}</th>
+            <th className="border border-gray-300 p-1 align-middle">{t.job}</th>
             <th className="border border-gray-300 p-1 align-middle">{t.startTime}</th>
             <th className="border border-gray-300 p-1 align-middle">{t.endTime}</th>
             <th className="border border-gray-300 p-1 align-middle">{t.pausePdf}</th>
@@ -122,25 +129,27 @@ export const PdfGenerator = forwardRef(({
           {monthlyEntries.map(entry => {
             if (entry.isVacation) {
                 return (
-                    <tr key={entry.id} className="text-center bg-blue-100">
+                    <tr key={entry.id} className="text-center" style={{ backgroundColor: '#e0f2fe' }}>
                         <td className="border border-gray-300 p-1 align-middle">{format(new Date(entry.date), 'dd.MM.yyyy')}</td>
-                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold align-middle">{t.vacation}</td>
+                        <td colSpan={6} className="border border-gray-300 p-1 font-semibold align-middle">{t.vacation}</td>
                     </tr>
                 )
             }
             if (entry.isHoliday) {
                 return (
-                    <tr key={entry.id} className="text-center bg-green-100">
+                    <tr key={entry.id} className="text-center" style={{ backgroundColor: '#dcfce7' }}>
                         <td className="border border-gray-300 p-1 align-middle">{format(new Date(entry.date), 'dd.MM.yyyy')}</td>
-                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold align-middle">{t.holiday}</td>
+                        <td colSpan={6} className="border border-gray-300 p-1 font-semibold align-middle">{t.holiday}</td>
                     </tr>
                 )
             }
             const overtimeHours = typeof entry.overtimeHours === 'number' ? entry.overtimeHours : 0;
             const totalHours = typeof entry.totalHours === 'number' ? entry.totalHours : 0;
+            const rowStyle = { backgroundColor: jobColors[entry.job] || 'transparent' };
             return (
-              <tr key={entry.id} className="text-center">
+              <tr key={entry.id} className="text-center" style={rowStyle}>
                 <td className="border border-gray-300 p-1 align-middle">{format(new Date(entry.date), 'dd.MM.yyyy')}</td>
+                <td className="border border-gray-300 p-1 align-middle">{t[entry.job]}</td>
                 <td className="border border-gray-300 p-1 align-middle">{entry.startTime}</td>
                 <td className="border border-gray-300 p-1 align-middle">{entry.endTime}</td>
                 <td className="border border-gray-300 p-1 align-middle">{entry.pause}</td>

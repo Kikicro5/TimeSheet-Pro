@@ -3,7 +3,7 @@
 import { useMemo, useRef, useContext } from 'react';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
-import { TimeEntry, OvertimeOption, DownloadHistoryEntry } from '@/types';
+import { TimeEntry, OvertimeOption, DownloadHistoryEntry, Job } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -24,6 +24,7 @@ import {
 import { PdfGenerator } from './pdf-generator';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
+import { cn } from '@/lib/utils';
 
 interface TimesheetListProps {
   entries: TimeEntry[];
@@ -41,6 +42,12 @@ interface TimesheetListProps {
 }
 
 const locales: { [key: string]: Locale } = { de, en: enUS };
+
+const jobRowColors: Record<Job, string> = {
+    job1: 'bg-blue-50 hover:bg-blue-100',
+    job2: 'bg-green-50 hover:bg-green-100',
+    job3: 'bg-amber-50 hover:bg-amber-100',
+};
 
 export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, setOvertimeOption, monthlySummary }: TimesheetListProps) {
   const pdfGeneratorRef = useRef<{ handleExportPDF: () => void; handleShare: () => void }>(null);
@@ -128,6 +135,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
           <TableHeader>
             <TableRow>
               <TableHead>{t.date}</TableHead>
+              <TableHead>{t.job}</TableHead>
               <TableHead>{t.startTime}</TableHead>
               <TableHead>{t.endTime}</TableHead>
               <TableHead>{t.pause}</TableHead>
@@ -139,7 +147,14 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
           <TableBody>
             {entries.map(entry => {
               const overtimeHours = typeof entry.overtimeHours === 'number' ? entry.overtimeHours : 0;
-              const rowClass = entry.isVacation ? 'bg-blue-50 hover:bg-blue-100' : entry.isHoliday ? 'bg-green-50 hover:bg-green-100' : '';
+              let rowClass = '';
+              if (entry.isVacation) {
+                rowClass = 'bg-blue-50 hover:bg-blue-100';
+              } else if (entry.isHoliday) {
+                rowClass = 'bg-green-50 hover:bg-green-100';
+              } else {
+                rowClass = jobRowColors[entry.job];
+              }
               
               const getLocationText = () => {
                 if (entry.isVacation) return t.vacation;
@@ -148,12 +163,13 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
               }
 
               return (
-              <TableRow key={entry.id} className={`animate-in fade-in-25 ${rowClass}`}>
+              <TableRow key={entry.id} className={cn('animate-in fade-in-25', rowClass)}>
                 <TableCell className="font-medium">{format(new Date(entry.date), 'dd.MM.yyyy')}</TableCell>
+                <TableCell className="font-semibold">{entry.isVacation || entry.isHoliday ? '-' : t[entry.job]}</TableCell>
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.startTime}</TableCell>
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.endTime}</TableCell>
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : `${entry.pause} min`}</TableCell>
-                <TableCell><div className="max-w-[200px] truncate">{getLocationText()}</div></TableCell>
+                <TableCell><div className="max-w-[150px] truncate">{getLocationText()}</div></TableCell>
                 <TableCell className={`text-right font-mono ${overtimeHours >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {entry.isVacation || entry.isHoliday ? '-' : overtimeHours.toFixed(2) + 'h'}
                 </TableCell>

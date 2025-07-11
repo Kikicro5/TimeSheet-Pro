@@ -39,6 +39,10 @@ export const translations = {
     holiday: 'Feiertag',
     entryExistsError: 'Eintrag für Datum existiert bereits:',
     pleaseSelectDate: 'Bitte wählen Sie ein Datum aus.',
+    job: 'Auftrag',
+    job1: 'Auftrag 1',
+    job2: 'Auftrag 2',
+    job3: 'Auftrag 3',
 
     // Timesheet List
     loggedEntries: 'Protokollierte Einträge',
@@ -126,6 +130,10 @@ export const translations = {
     holiday: 'Holiday',
     entryExistsError: 'Entry for date already exists:',
     pleaseSelectDate: 'Please select a date.',
+    job: 'Job',
+    job1: 'Job 1',
+    job2: 'Job 2',
+    job3: 'Job 3',
 
     // Timesheet List
     loggedEntries: 'Logged Entries',

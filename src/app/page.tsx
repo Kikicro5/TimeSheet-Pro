@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useContext } from 'react';
-import type { TimeEntry, OvertimeOption } from '@/types';
+import type { TimeEntry, OvertimeOption, Job } from '@/types';
 import { TimesheetForm } from '@/components/timesheet-form';
 import { TimesheetList } from '@/components/timesheet-list';
 import { PiggyBank, History, Briefcase } from 'lucide-react';
@@ -57,12 +57,12 @@ export default function Home() {
   }, [entries, overtimeOption, userName, isClient]);
   
   const addEntry = (entry: Omit<TimeEntry, 'id' | 'totalHours' | 'overtimeHours'>) => {
-    const dateExists = entries.some(e => new Date(e.date).toDateString() === new Date(entry.date).toDateString());
+    const dateExists = entries.some(e => new Date(e.date).toDateString() === new Date(entry.date).toDateString() && e.job === entry.job);
     if (dateExists) {
         toast({
             variant: 'destructive',
             title: t.error,
-            description: `${t.entryExistsError} ${format(entry.date, 'dd.MM.yyyy')}.`,
+            description: `${t.entryExistsError} ${format(entry.date, 'dd.MM.yyyy')} for ${t[entry.job]}.`,
         });
         return;
     }
@@ -77,6 +77,7 @@ export default function Home() {
             location: entry.isVacation ? t.vacation : t.holiday,
             totalHours: 0,
             overtimeHours: 0,
+            job: 'job1', // Default job
         };
         setEntries(prev => [...prev, newEntry].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
         return;

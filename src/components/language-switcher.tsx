@@ -33,6 +33,12 @@ export function LanguageSwitcher() {
         <DropdownMenuItem onClick={() => handleLanguageChange('de')} disabled={language === 'de'}>
           Deutsch
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleLanguageChange('en')} disabled={language === 'en'}>
+          English
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleLanguageChange('pl')} disabled={language === 'pl'}>
+          Polski
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

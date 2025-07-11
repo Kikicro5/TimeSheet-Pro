@@ -127,21 +127,21 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="bg-primary text-primary-foreground shadow-md">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center gap-4">
-          <h1 className="text-2xl font-bold font-headline">TimeSheet Pro</h1>
-          <div className="flex items-center gap-4">
+        <div className="w-full sm:container sm:mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold font-headline whitespace-nowrap">TimeSheet Pro</h1>
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
              {isClient && (
-                <div className="flex items-center gap-2 text-lg">
+                <div className="hidden sm:flex items-center gap-2 text-lg">
                   <PiggyBank className="h-6 w-6" />
                   <span>
                     {t.overtime}: {monthlySummary.totalOvertime.toFixed(2)}h
                   </span>
                 </div>
              )}
-             <Button asChild variant="outline" size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+             <Button asChild variant="outline" size="icon" className="sm:h-9 sm:w-auto sm:px-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                 <Link href="/history">
-                    <History className="mr-2 h-4 w-4" />
-                    {t.history}
+                    <History className="h-4 w-4" />
+                    <span className="hidden sm:inline-block sm:ml-2">{t.history}</span>
                 </Link>
              </Button>
              <LanguageSwitcher />

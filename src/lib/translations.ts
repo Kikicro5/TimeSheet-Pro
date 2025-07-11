@@ -22,7 +22,7 @@ export const translations = {
     pickADate: 'Wählen Sie ein Datum',
     startTime: 'Startzeit',
     endTime: 'Endzeit',
-    pause: 'Pause (Minuten)',
+    pause: 'Pause',
     location: 'Standort',
     locationPlaceholder: 'z.B. Hauptbüro',
     addVacation: 'Urlaub hinzufügen',

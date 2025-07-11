@@ -328,7 +328,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
         </div>
       </div>
        <div className="mt-2 pt-1 border-t">
-         <p><strong>Opcija za prekovremene:</strong> {overtimeOption === 'payout' ? 'Isplata' : 'Ostaje'}</p>
+         <p><strong>Prekovremeni:</strong> {overtimeOption === 'payout' ? 'Isplata' : 'Ostaje'}</p>
        </div>
     </div>
     </>

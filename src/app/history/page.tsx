@@ -39,8 +39,8 @@ export default function HistoryPage() {
       const parsedHistory = JSON.parse(savedHistory).map((h: any) => ({
         ...h,
         downloadDate: new Date(h.downloadDate),
-        // Ensure nested date objects are correctly parsed
-        entries: h.entries.map((e: any) => ({ ...e, date: new Date(e.date) }))
+        // Ensure nested date objects are correctly parsed, only if entries exist
+        entries: h.entries ? h.entries.map((e: any) => ({ ...e, date: new Date(e.date) })) : []
       }));
       setHistory(parsedHistory.sort((a: any, b: any) => b.downloadDate.getTime() - a.downloadDate.getTime()));
     }

@@ -138,7 +138,7 @@ export const translations = {
     holidays: 'Feiertage',
     overtimeOption: 'Überstundenoption',
     payout: 'Auszahlung',
-    keep: 'Behalten',
+    keep: 'stehen lassen',
     noEntries: 'Keine Einträge',
     addFirstEntry: 'Fügen Sie Ihren ersten Eintrag über das obige Formular hinzu.',
 

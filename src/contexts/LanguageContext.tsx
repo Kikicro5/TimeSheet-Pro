@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 
-export type Language = 'hr' | 'de' | 'en' | 'pl';
+export type Language = 'de' | 'en';
 
 interface LanguageContextType {
   language: Language;
@@ -10,18 +10,18 @@ interface LanguageContextType {
 }
 
 export const LanguageContext = createContext<LanguageContextType>({
-  language: 'hr',
+  language: 'en',
   setLanguage: () => {},
 });
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('hr');
+  const [language, setLanguage] = useState<Language>('en');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
     const savedLanguage = localStorage.getItem('language') as Language;
-    if (savedLanguage) {
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'de')) {
       setLanguage(savedLanguage);
     }
   }, []);

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import Link from 'next/link';
 import { DownloadHistoryEntry } from '@/types';
 import { format } from 'date-fns';
-import { hr, de, enUS, pl } from 'date-fns/locale';
+import { de, enUS } from 'date-fns/locale';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -30,7 +30,7 @@ interface HistoryPdfGeneratorHandles {
     handleShare: () => void;
 }
 
-const locales: { [key: string]: Locale } = { hr, de, en: enUS, pl };
+const locales: { [key: string]: Locale } = { de, en: enUS };
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<DownloadHistoryEntry[]>([]);
@@ -38,7 +38,7 @@ export default function HistoryPage() {
   const pdfGeneratorRef = useRef<Record<string, HistoryPdfGeneratorHandles>>({});
   const { language } = useContext(LanguageContext);
   const t = translations[language];
-  const locale = locales[language] || hr;
+  const locale = locales[language] || enUS;
 
   useEffect(() => {
     setIsClient(true);
@@ -112,7 +112,7 @@ export default function HistoryPage() {
                   {history.map((entry) => (
                     <TableRow key={entry.id}>
                       <TableCell className="font-medium">{format(new Date(entry.downloadDate), 'LLLL yyyy', { locale })}</TableCell>
-                      <TableCell>{format(entry.downloadDate, `dd.MM.yyyy '${language === 'hr' ? 'u' : language === 'de' ? 'um' : 'at'}' HH:mm`, { locale })}</TableCell>
+                      <TableCell>{format(entry.downloadDate, `dd.MM.yyyy '${language === 'de' ? 'um' : 'at'}' HH:mm`, { locale })}</TableCell>
                        <TableCell className="text-right">
                           <Button variant="ghost" size="icon" onClick={() => handleExport(entry.id)} className="text-muted-foreground hover:text-primary">
                               <FileType2 className="h-4 w-4" />

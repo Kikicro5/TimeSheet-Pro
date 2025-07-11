@@ -27,17 +27,11 @@ export function LanguageSwitcher() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleLanguageChange('hr')} disabled={language === 'hr'}>
-          Hrvatski
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleLanguageChange('de')} disabled={language === 'de'}>
           Deutsch
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleLanguageChange('en')} disabled={language === 'en'}>
           English
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleLanguageChange('pl')} disabled={language === 'pl'}>
-          Polski
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

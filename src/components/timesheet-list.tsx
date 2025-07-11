@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useContext } from 'react';
 import { format } from 'date-fns';
-import { hr, de, enUS, pl } from 'date-fns/locale';
+import { de, enUS } from 'date-fns/locale';
 import { TimeEntry, OvertimeOption, DownloadHistoryEntry } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -40,13 +40,13 @@ interface TimesheetListProps {
   };
 }
 
-const locales: { [key: string]: Locale } = { hr, de, en: enUS, pl };
+const locales: { [key: string]: Locale } = { de, en: enUS };
 
 export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, setOvertimeOption, monthlySummary }: TimesheetListProps) {
   const pdfGeneratorRef = useRef<{ handleExportPDF: () => void; handleShare: () => void }>(null);
   const { language } = useContext(LanguageContext);
   const t = translations[language];
-  const locale = locales[language] || hr;
+  const locale = locales[language] || enUS;
 
   const now = new Date();
   const monthName = format(now, 'LLLL yyyy', { locale });

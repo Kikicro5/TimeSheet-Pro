@@ -104,7 +104,6 @@ export default function HistoryPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t.month}</TableHead>
-                    <TableHead>{t.nameAndSurname}</TableHead>
                     <TableHead>{t.downloadDate}</TableHead>
                     <TableHead className="text-right">{t.actions}</TableHead>
                   </TableRow>
@@ -113,7 +112,6 @@ export default function HistoryPage() {
                   {history.map((entry) => (
                     <TableRow key={entry.id}>
                       <TableCell className="font-medium">{format(new Date(entry.downloadDate), 'LLLL yyyy', { locale })}</TableCell>
-                      <TableCell>{entry.userName}</TableCell>
                       <TableCell>{format(entry.downloadDate, `dd.MM.yyyy '${language === 'hr' ? 'u' : language === 'de' ? 'um' : 'at'}' HH:mm`, { locale })}</TableCell>
                        <TableCell className="text-right">
                           <Button variant="ghost" size="icon" onClick={() => handleExport(entry.id)} className="text-muted-foreground hover:text-primary">

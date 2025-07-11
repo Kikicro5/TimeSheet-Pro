@@ -29,10 +29,9 @@ export const PdfGenerator = forwardRef(({
 }: PdfGeneratorProps, ref) => {
   const pdfRef = useRef<HTMLDivElement>(null);
 
-  useImperativeHandle(ref, () => ({
-    handleExportPDF: async () => {
+  const generatePdfInstance = async () => {
       const input = pdfRef.current;
-      if (!input) return;
+      if (!input) return null;
 
       input.style.display = 'block';
       input.style.position = 'absolute';
@@ -55,39 +54,45 @@ export const PdfGenerator = forwardRef(({
       const imgY = 15;
 
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      pdf.save(`lista_sati_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`);
+      return pdf;
+  }
+
+  useImperativeHandle(ref, () => ({
+    handleExportPDF: async () => {
+      const pdf = await generatePdfInstance();
+      if (pdf) {
+        pdf.save(`lista_sati_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`);
+      }
     },
     handleShare: async () => {
-      const input = pdfRef.current;
-      if (!input || !navigator.share) {
+      if (!navigator.share) {
         alert('Dijeljenje nije podržano na ovom pregledniku.');
         return;
       }
-
-      input.style.display = 'block';
-      input.style.position = 'absolute';
-      input.style.left = '-9999px';
+      
+      const pdf = await generatePdfInstance();
+      if (!pdf) return;
 
       try {
-          const canvas = await html2canvas(input, { scale: 2 });
-          input.style.display = 'none';
-          input.style.position = 'static';
-          input.style.left = '0';
+          const pdfBlob = pdf.output('blob');
+          const pdfFile = new File(
+              [pdfBlob], 
+              `lista_sati_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`, 
+              { type: 'application/pdf' }
+          );
 
-          canvas.toBlob(async (blob) => {
-              if (!blob) return;
-              const file = new File([blob], `lista_sati_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.png`, { type: 'image/png' });
+          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
               await navigator.share({
                   title: `Lista sati za ${monthName}`,
                   text: `Mjesečna lista sati za ${userName} za ${monthName}.`,
-                  files: [file],
+                  files: [pdfFile],
               });
-          }, 'image/png');
+          } else {
+             alert('Dijeljenje PDF datoteka nije podržano na ovom uređaju.');
+          }
       } catch (error) {
           console.error('Greška pri dijeljenju:', error);
-          input.style.display = 'none';
-          input.style.position = 'static';
-          input.style.left = '0';
+          alert('Došlo je do greške prilikom pokušaja dijeljenja.');
       }
     }
   }));

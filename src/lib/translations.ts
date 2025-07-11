@@ -81,6 +81,10 @@ export const translations = {
     for: 'für',
     sharingPdfNotSupported: 'Das Teilen von PDF-Dateien wird auf diesem Gerät nicht unterstützt.',
     sharingError: 'Beim Versuch zu teilen ist ein Fehler aufgetreten.',
+
+    // Yearly Summary
+    yearlySummary: 'Jahresübersicht',
+    yearlySummaryDesc: 'Hier ist eine Zusammenfassung Ihrer Überstunden und Urlaubstage für das laufende Jahr.',
   },
   en: {
     // General
@@ -164,5 +168,9 @@ export const translations = {
     for: 'for',
     sharingPdfNotSupported: 'Sharing PDF files is not supported on this device.',
     sharingError: 'An error occurred while trying to share.',
+    
+    // Yearly Summary
+    yearlySummary: 'Yearly Summary',
+    yearlySummaryDesc: 'Here is a summary of your overtime and vacation days for the current year.',
   },
 };

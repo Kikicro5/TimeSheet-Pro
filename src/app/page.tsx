@@ -13,6 +13,14 @@ import Link from 'next/link';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
@@ -125,6 +133,29 @@ export default function Home() {
     );
   }, [entries, isClient]);
 
+  const yearlySummary = useMemo(() => {
+    if (!isClient) return { totalOvertime: 0, vacationDays: 0 };
+    const now = new Date();
+    const currentYear = now.getFullYear();
+
+    const yearlyEntries = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entryDate.getFullYear() === currentYear;
+    });
+
+    return yearlyEntries.reduce(
+      (acc, entry) => {
+        if (entry.isVacation) {
+          acc.vacationDays += 1;
+        } else if (!entry.isHoliday) {
+          acc.totalOvertime += (entry.overtimeHours || 0);
+        }
+        return acc;
+      },
+      { totalOvertime: 0, vacationDays: 0 }
+    );
+  }, [entries, isClient]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="bg-primary text-primary-foreground shadow-md">
@@ -134,6 +165,34 @@ export default function Home() {
             <h1 className="text-xl sm:text-2xl font-bold font-headline whitespace-nowrap">TimeSheet Pro</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+             <Dialog>
+               <DialogTrigger asChild>
+                  <Button variant="outline" className="h-9 px-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                    <PiggyBank className="h-4 w-4" />
+                    <span className="ml-2 hidden sm:inline">{t.yearlySummary}</span>
+                  </Button>
+               </DialogTrigger>
+               <DialogContent>
+                 <DialogHeader>
+                   <DialogTitle>{t.yearlySummary} {new Date().getFullYear()}</DialogTitle>
+                   <DialogDescription>
+                    {t.yearlySummaryDesc}
+                   </DialogDescription>
+                 </DialogHeader>
+                 <div className="grid gap-4 py-4">
+                    <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t.totalOvertime}</span>
+                        <span className={`font-bold text-lg ${yearlySummary.totalOvertime >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {yearlySummary.totalOvertime.toFixed(2)}h
+                        </span>
+                    </div>
+                     <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t.vacationDays}</span>
+                        <span className="font-bold text-lg">{yearlySummary.vacationDays}</span>
+                    </div>
+                 </div>
+               </DialogContent>
+             </Dialog>
              <Button asChild variant="outline" className="h-9 px-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                 <Link href="/history" className="flex items-center">
                     <History className="h-4 w-4" />

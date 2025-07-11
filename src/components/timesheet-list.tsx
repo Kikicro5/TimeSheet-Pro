@@ -269,20 +269,20 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
     </Card>
 
     {/* Hidden div for PDF export */}
-    <div ref={pdfRef} style={{ display: 'none', width: '210mm', minHeight: '297mm' }} className="p-4 bg-white text-black text-xs">
-      <div className="flex justify-between items-center mb-4 pb-1 border-b border-gray-800">
-        <h1 className="text-base font-bold">{userName}</h1>
-        <h2 className="text-base text-gray-700">{monthName}</h2>
+    <div ref={pdfRef} style={{ display: 'none', width: '210mm', minHeight: '297mm', padding: '10mm' }} className="bg-white text-black text-xs">
+      <div className="flex justify-between items-center mb-2 pb-1 border-b border-gray-800">
+        <h1 className="text-sm font-bold">{userName}</h1>
+        <h2 className="text-sm text-gray-700">{monthName}</h2>
       </div>
       <table className="w-full text-xs border-collapse border border-gray-400">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border border-gray-300 p-1">Datum</th>
-            <th className="border border-gray-300 p-1">Početak</th>
-            <th className="border border-gray-300 p-1">Kraj</th>
-            <th className="border border-gray-300 p-1">Pauza (min)</th>
-            <th className="border border-gray-300 p-1">Radni sati</th>
-            <th className="border border-gray-300 p-1">Prekovremeni</th>
+            <th className="border border-gray-300 p-1 align-middle">Datum</th>
+            <th className="border border-gray-300 p-1 align-middle">Početak</th>
+            <th className="border border-gray-300 p-1 align-middle">Kraj</th>
+            <th className="border border-gray-300 p-1 align-middle">Pauza (min)</th>
+            <th className="border border-gray-300 p-1 align-middle">Radni sati</th>
+            <th className="border border-gray-300 p-1 align-middle">Prekovremeni</th>
           </tr>
         </thead>
         <tbody>
@@ -290,16 +290,16 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
             if (entry.isVacation) {
                 return (
                     <tr key={entry.id} className="text-center bg-blue-100">
-                        <td className="border border-gray-300 p-1">{format(entry.date, 'dd.MM.yyyy')}</td>
-                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold">Godišnji odmor</td>
+                        <td className="border border-gray-300 p-1 align-middle">{format(entry.date, 'dd.MM.yyyy')}</td>
+                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold align-middle">Godišnji odmor</td>
                     </tr>
                 )
             }
             if (entry.isHoliday) {
                 return (
                     <tr key={entry.id} className="text-center bg-green-100">
-                        <td className="border border-gray-300 p-1">{format(entry.date, 'dd.MM.yyyy')}</td>
-                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold">Praznik</td>
+                        <td className="border border-gray-300 p-1 align-middle">{format(entry.date, 'dd.MM.yyyy')}</td>
+                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold align-middle">Praznik</td>
                     </tr>
                 )
             }
@@ -307,12 +307,12 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
             const totalHours = typeof entry.totalHours === 'number' ? entry.totalHours : 0;
             return (
               <tr key={entry.id} className="text-center">
-                <td className="border border-gray-300 p-1">{format(entry.date, 'dd.MM.yyyy')}</td>
-                <td className="border border-gray-300 p-1">{entry.startTime}</td>
-                <td className="border border-gray-300 p-1">{entry.endTime}</td>
-                <td className="border border-gray-300 p-1">{entry.pause}</td>
-                <td className="border border-gray-300 p-1">{totalHours.toFixed(2)}h</td>
-                <td className="border border-gray-300 p-1">{overtimeHours.toFixed(2)}h</td>
+                <td className="border border-gray-300 p-1 align-middle">{format(entry.date, 'dd.MM.yyyy')}</td>
+                <td className="border border-gray-300 p-1 align-middle">{entry.startTime}</td>
+                <td className="border border-gray-300 p-1 align-middle">{entry.endTime}</td>
+                <td className="border border-gray-300 p-1 align-middle">{entry.pause}</td>
+                <td className="border border-gray-300 p-1 align-middle">{totalHours.toFixed(2)}h</td>
+                <td className="border border-gray-300 p-1 align-middle">{overtimeHours.toFixed(2)}h</td>
               </tr>
             )
           })}

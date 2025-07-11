@@ -110,7 +110,7 @@ export default function HistoryPage() {
                 <TableBody>
                   {history.map((entry) => (
                     <TableRow key={entry.id}>
-                      <TableCell className="font-medium">{entry.monthName}</TableCell>
+                      <TableCell className="font-medium">{format(new Date(entry.downloadDate), 'LLLL yyyy', { locale })}</TableCell>
                       <TableCell>{entry.userName}</TableCell>
                       <TableCell>{format(entry.downloadDate, `dd.MM.yyyy '${language === 'hr' ? 'u' : 'um'}' HH:mm`, { locale })}</TableCell>
                        <TableCell className="text-right">
@@ -197,7 +197,7 @@ export default function HistoryPage() {
               }
           }}
           userName={entry.userName}
-          monthName={entry.monthName}
+          monthName={format(new Date(entry.downloadDate), 'LLLL yyyy', { locale })}
           monthlyEntries={entry.entries}
           monthlySummary={entry.monthlySummary}
           overtimeOption={entry.overtimeOption}

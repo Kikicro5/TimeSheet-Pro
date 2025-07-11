@@ -138,13 +138,20 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
             {entries.map(entry => {
               const overtimeHours = typeof entry.overtimeHours === 'number' ? entry.overtimeHours : 0;
               const rowClass = entry.isVacation ? 'bg-blue-50 hover:bg-blue-100' : entry.isHoliday ? 'bg-green-50 hover:bg-green-100' : '';
+              
+              const getLocationText = () => {
+                if (entry.isVacation) return t.vacation;
+                if (entry.isHoliday) return t.holiday;
+                return entry.location;
+              }
+
               return (
               <TableRow key={entry.id} className={`animate-in fade-in-25 ${rowClass}`}>
                 <TableCell className="font-medium">{format(new Date(entry.date), 'dd.MM.yyyy')}</TableCell>
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.startTime}</TableCell>
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.endTime}</TableCell>
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : `${entry.pause} min`}</TableCell>
-                <TableCell><div className="max-w-[200px] truncate">{entry.location}</div></TableCell>
+                <TableCell><div className="max-w-[200px] truncate">{getLocationText()}</div></TableCell>
                 <TableCell className={`text-right font-mono ${overtimeHours >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {entry.isVacation || entry.isHoliday ? '-' : overtimeHours.toFixed(2) + 'h'}
                 </TableCell>

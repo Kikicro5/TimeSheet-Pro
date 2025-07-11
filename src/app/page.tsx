@@ -77,7 +77,6 @@ export default function Home() {
             location: entry.isVacation ? t.vacation : t.holiday,
             totalHours: 0,
             overtimeHours: 0,
-            job: 'job1', // Default job
         };
         setEntries(prev => [...prev, newEntry].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
         return;
@@ -113,24 +112,28 @@ export default function Home() {
     const currentYear = now.getFullYear();
 
     const monthlyEntries = entries.filter(entry => {
-      const entryDate = new Date(entry.date);
-      return entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear;
+        const entryDate = new Date(entry.date);
+        return entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear;
     });
 
-    return monthlyEntries.reduce(
-      (acc, entry) => {
-        if (entry.isVacation) {
-            acc.vacationDays += 1;
-        } else if (entry.isHoliday) {
-            acc.holidayDays += 1;
-        } else {
-            acc.totalWorkHours += (entry.totalHours || 0);
-            acc.totalOvertime += (entry.overtimeHours || 0);
-            acc.totalPause += (entry.pause || 0);
-        }
-        return acc;
-      },
-      { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 }
+    const job1Entries = monthlyEntries.filter(entry =>
+        entry.job === 'job1' || entry.isVacation || entry.isHoliday
+    );
+
+    return job1Entries.reduce(
+        (acc, entry) => {
+            if (entry.isVacation) {
+                acc.vacationDays += 1;
+            } else if (entry.isHoliday) {
+                acc.holidayDays += 1;
+            } else {
+                acc.totalWorkHours += (entry.totalHours || 0);
+                acc.totalOvertime += (entry.overtimeHours || 0);
+                acc.totalPause += (entry.pause || 0);
+            }
+            return acc;
+        },
+        { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 }
     );
   }, [entries, isClient]);
 

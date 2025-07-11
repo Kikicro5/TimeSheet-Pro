@@ -40,9 +40,9 @@ export const translations = {
     holiday: 'Feiertag',
     entryExistsError: 'Eintrag für Datum existiert bereits:',
     pleaseSelectDate: 'Bitte wählen Sie ein Datum aus.',
-    job: 'Auftrag',
-    job1: 'Auftrag 1',
-    job2: 'Auftrag 2',
+    job: 'Job',
+    job1: 'Job 1',
+    job2: 'Job 2',
 
     // Timesheet List
     loggedEntries: 'Protokollierte Einträge',

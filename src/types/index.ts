@@ -7,6 +7,7 @@ export interface TimeEntry {
   location: string;
   totalHours: number;
   overtimeHours: number;
+  isVacation?: boolean;
 }
 
 export type OvertimeOption = 'payout' | 'keep';

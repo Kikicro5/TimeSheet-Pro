@@ -33,6 +33,21 @@ export default function Home() {
   }, [entries, overtimeOption, isClient]);
 
   const addEntry = (entry: Omit<TimeEntry, 'id' | 'totalHours' | 'overtimeHours'>) => {
+    if (entry.isVacation) {
+        const newEntry: TimeEntry = {
+            ...entry,
+            id: new Date().toISOString() + Math.random(),
+            startTime: '',
+            endTime: '',
+            pause: 0,
+            location: 'Godišnji odmor',
+            totalHours: 0,
+            overtimeHours: 0,
+        };
+        setEntries(prev => [...prev, newEntry].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+        return;
+    }
+
     const start = new Date(`1970-01-01T${entry.startTime}:00`);
     const end = new Date(`1970-01-01T${entry.endTime}:00`);
     let diffMs = end.getTime() - start.getTime();
@@ -57,7 +72,7 @@ export default function Home() {
   };
   
   const monthlySummary = useMemo(() => {
-    if (!isClient) return { totalWorkHours: 0, totalOvertime: 0, totalPause: 0 };
+    if (!isClient) return { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0 };
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
@@ -69,12 +84,16 @@ export default function Home() {
 
     return monthlyEntries.reduce(
       (acc, entry) => {
-        acc.totalWorkHours += entry.totalHours;
-        acc.totalOvertime += entry.overtimeHours;
-        acc.totalPause += entry.pause;
+        if (entry.isVacation) {
+            acc.vacationDays += 1;
+        } else {
+            acc.totalWorkHours += entry.totalHours;
+            acc.totalOvertime += entry.overtimeHours;
+            acc.totalPause += entry.pause;
+        }
         return acc;
       },
-      { totalWorkHours: 0, totalOvertime: 0, totalPause: 0 }
+      { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0 }
     );
   }, [entries, isClient]);
 

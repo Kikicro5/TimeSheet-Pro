@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Sparkles, Loader2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Sparkles, Loader2, Plane } from 'lucide-react';
 import { getAISuggestion } from '@/app/actions';
 
 const formSchema = z.object({
@@ -27,7 +27,7 @@ const formSchema = z.object({
 type TimesheetFormValues = z.infer<typeof formSchema>;
 
 interface TimesheetFormProps {
-  addEntry: (data: TimesheetFormValues) => void;
+  addEntry: (data: TimesheetFormValues & { isVacation?: boolean }) => void;
 }
 
 export function TimesheetForm({ addEntry }: TimesheetFormProps) {
@@ -79,6 +79,22 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
         endTime: '16:00',
         pause: 60,
         location: '', 
+    });
+  }
+
+  const handleAddVacation = () => {
+    const vacationDate = form.getValues('date');
+    addEntry({
+        date: vacationDate,
+        startTime: '',
+        endTime: '',
+        pause: 0,
+        location: '',
+        isVacation: true,
+    });
+    toast({
+        title: "Godišnji odmor dodan",
+        description: `Dan ${format(vacationDate, 'PPP')} je zabilježen kao godišnji odmor.`,
     });
   }
 
@@ -190,7 +206,11 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
               )}
             />
           </CardContent>
-          <CardFooter className="flex justify-end">
+          <CardFooter className="flex justify-end gap-2">
+             <Button type="button" variant="outline" onClick={handleAddVacation}>
+                <Plane className="mr-2 h-4 w-4"/>
+                Dodaj godišnji
+             </Button>
              <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90">Save Entry</Button>
           </CardFooter>
         </form>

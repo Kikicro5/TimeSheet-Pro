@@ -23,8 +23,8 @@ interface PdfGeneratorProps {
 export const PdfGenerator = forwardRef(({
   userName,
   monthName,
-  monthlyEntries,
-  monthlySummary,
+  monthlyEntries = [],
+  monthlySummary = { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 },
   overtimeOption,
 }: PdfGeneratorProps, ref) => {
   const pdfRef = useRef<HTMLDivElement>(null);

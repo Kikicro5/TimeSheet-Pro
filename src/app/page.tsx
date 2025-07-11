@@ -134,10 +134,13 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
              {isClient && (
-                <div className="hidden sm:flex items-center gap-2 text-lg">
+                <div className="flex items-center gap-2 text-sm sm:text-lg">
                   <PiggyBank className="h-6 w-6" />
-                  <span>
+                  <span className="hidden sm:inline">
                     {t.overtime}: {monthlySummary.totalOvertime.toFixed(2)}h
+                  </span>
+                   <span className="sm:hidden">
+                    {monthlySummary.totalOvertime.toFixed(2)}h
                   </span>
                 </div>
              )}

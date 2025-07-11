@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,10 +13,11 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Sparkles, Loader2, Plane, PartyPopper } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Sparkles, Loader2, Plane, PartyPopper, User } from 'lucide-react';
 import { getAISuggestion } from '@/app/actions';
 
 const formSchema = z.object({
+  userName: z.string().min(1, 'Ime i prezime je obavezno.'),
   date: z.date({ required_error: 'A date is required.' }),
   startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:mm)'),
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:mm)'),
@@ -27,16 +28,19 @@ const formSchema = z.object({
 type TimesheetFormValues = z.infer<typeof formSchema>;
 
 interface TimesheetFormProps {
-  addEntry: (data: TimesheetFormValues & { isVacation?: boolean; isHoliday?: boolean }) => void;
+  addEntry: (data: Omit<TimesheetFormValues, 'userName'> & { isVacation?: boolean; isHoliday?: boolean }) => void;
+  userName: string;
+  setUserName: (name: string) => void;
 }
 
-export function TimesheetForm({ addEntry }: TimesheetFormProps) {
+export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetFormProps) {
   const { toast } = useToast();
   const [isSuggesting, setIsSuggesting] = useState(false);
 
   const form = useForm<TimesheetFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      userName: userName,
       date: new Date(),
       startTime: '07:00',
       endTime: '16:00',
@@ -44,6 +48,10 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
       location: '',
     },
   });
+
+  useEffect(() => {
+    form.setValue('userName', userName);
+  }, [userName, form]);
 
   const handleSuggestLocation = async () => {
     setIsSuggesting(true);
@@ -67,7 +75,9 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
   };
 
   function onSubmit(data: TimesheetFormValues) {
-    addEntry(data);
+    const { userName, ...entryData } = data;
+    setUserName(userName);
+    addEntry(entryData);
     toast({
         title: "Entry Added",
         description: `Your work on ${format(data.date, 'PPP')} has been logged.`,
@@ -82,35 +92,25 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
     });
   }
 
-  const handleAddVacation = () => {
-    const vacationDate = form.getValues('date');
+  const handleAddSpecialDay = (isVacation: boolean) => {
+    const { date, userName } = form.getValues();
+    if (!date) {
+        toast({ variant: 'destructive', title: 'Greška', description: 'Molimo odaberite datum.' });
+        return;
+    }
+     setUserName(userName);
     addEntry({
-        date: vacationDate,
+        date: date,
         startTime: '',
         endTime: '',
         pause: 0,
         location: '',
-        isVacation: true,
+        isVacation: isVacation,
+        isHoliday: !isVacation
     });
     toast({
-        title: "Godišnji odmor dodan",
-        description: `Dan ${format(vacationDate, 'PPP')} je zabilježen kao godišnji odmor.`,
-    });
-  }
-
-  const handleAddHoliday = () => {
-    const holidayDate = form.getValues('date');
-    addEntry({
-        date: holidayDate,
-        startTime: '',
-        endTime: '',
-        pause: 0,
-        location: '',
-        isHoliday: true,
-    });
-    toast({
-        title: "Praznik dodan",
-        description: `Dan ${format(holidayDate, 'PPP')} je zabilježen kao praznik.`,
+        title: isVacation ? "Godišnji odmor dodan" : "Praznik dodan",
+        description: `Dan ${format(date, 'PPP')} je zabilježen kao ${isVacation ? 'godišnji odmor' : 'praznik'}.`,
     });
   }
 
@@ -123,6 +123,22 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FormField
+              control={form.control}
+              name="userName"
+              render={({ field }) => (
+                <FormItem className="sm:col-span-2 lg:col-span-3">
+                  <FormLabel>Ime i prezime</FormLabel>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <FormControl>
+                      <Input placeholder="npr. Ivan Horvat" className="pl-10" {...field} />
+                    </FormControl>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="date"
@@ -223,11 +239,11 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
             />
           </CardContent>
           <CardFooter className="flex justify-end gap-2 flex-wrap">
-             <Button type="button" variant="outline" onClick={handleAddVacation}>
+             <Button type="button" variant="outline" onClick={() => handleAddSpecialDay(true)}>
                 <Plane className="mr-2 h-4 w-4"/>
                 Dodaj godišnji
              </Button>
-             <Button type="button" variant="outline" onClick={handleAddHoliday}>
+             <Button type="button" variant="outline" onClick={() => handleAddSpecialDay(false)}>
                 <PartyPopper className="mr-2 h-4 w-4"/>
                 Dodaj praznik
              </Button>

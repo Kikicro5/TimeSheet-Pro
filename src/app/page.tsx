@@ -5,12 +5,15 @@ import type { TimeEntry, OvertimeOption } from '@/types';
 import { TimesheetForm } from '@/components/timesheet-form';
 import { TimesheetList } from '@/components/timesheet-list';
 import { PiggyBank } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [userName, setUserName] = useState('John Doe'); // Example user name
   const [overtimeOption, setOvertimeOption] = useState<OvertimeOption>('keep');
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
@@ -23,16 +26,31 @@ export default function Home() {
     if (savedOvertimeOption) {
       setOvertimeOption(savedOvertimeOption);
     }
+    const savedUserName = localStorage.getItem('user-name');
+    if (savedUserName) {
+      setUserName(savedUserName);
+    }
   }, []);
 
   useEffect(() => {
     if(isClient) {
       localStorage.setItem('timesheet-entries', JSON.stringify(entries));
       localStorage.setItem('overtime-option', overtimeOption);
+      localStorage.setItem('user-name', userName);
     }
-  }, [entries, overtimeOption, isClient]);
-
+  }, [entries, overtimeOption, userName, isClient]);
+  
   const addEntry = (entry: Omit<TimeEntry, 'id' | 'totalHours' | 'overtimeHours'>) => {
+    const dateExists = entries.some(e => new Date(e.date).toDateString() === new Date(entry.date).toDateString());
+    if (dateExists) {
+        toast({
+            variant: 'destructive',
+            title: 'Greška pri unosu',
+            description: `Unos za datum ${format(entry.date, 'dd.MM.yyyy')} već postoji.`,
+        });
+        return;
+    }
+
     if (entry.isVacation || entry.isHoliday) {
         const newEntry: TimeEntry = {
             ...entry,
@@ -115,7 +133,11 @@ export default function Home() {
         </div>
       </header>
       <main className="container mx-auto p-4 sm:p-6 lg:p-8 grid gap-8">
-        <TimesheetForm addEntry={addEntry} />
+        <TimesheetForm 
+          addEntry={addEntry} 
+          userName={userName}
+          setUserName={setUserName}
+        />
         <TimesheetList 
           entries={entries} 
           deleteEntry={deleteEntry}

@@ -13,8 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Sparkles, Loader2, Plane, PartyPopper, User } from 'lucide-react';
-import { getAISuggestion } from '@/app/actions';
+import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Plane, PartyPopper, User } from 'lucide-react';
 
 const formSchema = z.object({
   userName: z.string().min(1, 'Ime i prezime je obavezno.'),
@@ -35,7 +34,6 @@ interface TimesheetFormProps {
 
 export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetFormProps) {
   const { toast } = useToast();
-  const [isSuggesting, setIsSuggesting] = useState(false);
 
   const form = useForm<TimesheetFormValues>({
     resolver: zodResolver(formSchema),
@@ -52,27 +50,6 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
   useEffect(() => {
     form.setValue('userName', userName);
   }, [userName, form]);
-
-  const handleSuggestLocation = async () => {
-    setIsSuggesting(true);
-    const time = form.getValues('startTime');
-    const result = await getAISuggestion(time);
-    setIsSuggesting(false);
-
-    if (result.success && result.location) {
-      form.setValue('location', result.location, { shouldValidate: true });
-      toast({
-        title: "AI Suggestion ✨",
-        description: result.reason,
-      });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Suggestion Failed',
-        description: result.error || 'Could not fetch a location suggestion.',
-      });
-    }
-  };
 
   function onSubmit(data: TimesheetFormValues) {
     const { userName, ...entryData } = data;
@@ -222,16 +199,11 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               render={({ field }) => (
                 <FormItem className="lg:col-span-2">
                   <FormLabel>Location</FormLabel>
-                  <div className="flex gap-2">
-                    <div className="relative flex-grow">
-                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <FormControl>
-                        <Input placeholder="e.g., Main Office" className="pl-10" {...field} />
-                      </FormControl>
-                    </div>
-                    <Button type="button" variant="outline" size="icon" onClick={handleSuggestLocation} disabled={isSuggesting} aria-label="Suggest Location">
-                      {isSuggesting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-accent" />}
-                    </Button>
+                  <div className="relative flex-grow">
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <FormControl>
+                      <Input placeholder="e.g., Main Office" className="pl-10" {...field} />
+                    </FormControl>
                   </div>
                   <FormMessage />
                 </FormItem>

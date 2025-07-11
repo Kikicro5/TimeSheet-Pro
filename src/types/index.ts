@@ -32,4 +32,5 @@ export interface DownloadHistoryEntry {
     holidayDays: number;
   };
   overtimeOption: OvertimeOption;
+  job?: Job;
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useContext } from 'react';
 import Link from 'next/link';
-import { DownloadHistoryEntry } from '@/types';
+import { DownloadHistoryEntry, Job } from '@/types';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +23,7 @@ import {
 import { PdfGenerator } from '@/components/pdf-generator';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
+import { Badge } from '@/components/ui/badge';
 
 interface HistoryPdfGeneratorHandles {
     handleExportPDF: () => void;
@@ -71,6 +72,12 @@ export default function HistoryPage() {
     pdfGeneratorRef.current[id]?.handleShare();
   };
 
+  const getJobBadgeVariant = (job?: Job): "default" | "secondary" => {
+    if (job === 'job1') return 'default';
+    if (job === 'job2') return 'secondary';
+    return 'default';
+  }
+
   if (!isClient) {
     return null; // or a loading skeleton
   }
@@ -103,6 +110,7 @@ export default function HistoryPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t.month}</TableHead>
+                    <TableHead>{t.job}</TableHead>
                     <TableHead>{t.downloadDate}</TableHead>
                     <TableHead className="text-right">{t.actions}</TableHead>
                   </TableRow>
@@ -111,6 +119,13 @@ export default function HistoryPage() {
                   {history.map((entry) => (
                     <TableRow key={entry.id}>
                       <TableCell className="font-medium">{format(new Date(entry.downloadDate), 'LLLL yyyy', { locale })}</TableCell>
+                       <TableCell>
+                        {entry.job ? (
+                           <Badge variant={getJobBadgeVariant(entry.job)}>{t[entry.job]}</Badge>
+                        ) : (
+                          <Badge variant="outline">Svi</Badge>
+                        )}
+                      </TableCell>
                       <TableCell>{format(entry.downloadDate, `dd.MM.yyyy '${language === 'de' ? 'um' : 'at'}' HH:mm`, { locale })}</TableCell>
                        <TableCell className="text-right">
                           <Button variant="ghost" size="icon" onClick={() => handleExport(entry.id)} className="text-muted-foreground hover:text-primary">
@@ -200,6 +215,7 @@ export default function HistoryPage() {
           monthlyEntries={entry.entries}
           monthlySummary={entry.monthlySummary}
           overtimeOption={entry.overtimeOption}
+          job={entry.job}
         />
     ))}
     </>

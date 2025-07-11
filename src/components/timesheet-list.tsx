@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useContext } from 'react';
+import { useMemo, useRef, useContext, useState } from 'react';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { TimeEntry, OvertimeOption, DownloadHistoryEntry, Job } from '@/types';
@@ -25,6 +25,13 @@ import { PdfGenerator } from './pdf-generator';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
 import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface TimesheetListProps {
   entries: TimeEntry[];
@@ -41,6 +48,11 @@ interface TimesheetListProps {
   };
 }
 
+interface PdfGeneratorHandles {
+  handleExportPDF: () => void;
+  handleShare: () => void;
+}
+
 const locales: { [key: string]: Locale } = { de, en: enUS };
 
 const jobRowColors: Record<Job, string> = {
@@ -49,10 +61,11 @@ const jobRowColors: Record<Job, string> = {
 };
 
 export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, setOvertimeOption, monthlySummary }: TimesheetListProps) {
-  const pdfGeneratorRef = useRef<{ handleExportPDF: () => void; handleShare: () => void }>(null);
+  const pdfGeneratorRef = useRef<PdfGeneratorHandles>(null);
   const { language } = useContext(LanguageContext);
   const t = translations[language];
   const locale = locales[language] || enUS;
+  const [pdfData, setPdfData] = useState<{ entries: TimeEntry[], summary: any, job?: Job } | null>(null);
 
   const now = new Date();
   const monthName = format(now, 'LLLL yyyy', { locale });
@@ -63,35 +76,62 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
       return entryDate.getMonth() === now.getMonth() && entryDate.getFullYear() === now.getFullYear();
     });
   }, [entries, now]);
+
+  const calculateSummaryForJob = (job: Job | null) => {
+    const targetEntries = job ? monthlyEntries.filter(e => e.job === job) : monthlyEntries;
+    return targetEntries.reduce(
+      (acc, entry) => {
+        if (entry.isVacation) {
+            acc.vacationDays += 1;
+        } else if (entry.isHoliday) {
+            acc.holidayDays += 1;
+        } else {
+            acc.totalWorkHours += (entry.totalHours || 0);
+            acc.totalOvertime += (entry.overtimeHours || 0);
+            acc.totalPause += (entry.pause || 0);
+        }
+        return acc;
+      },
+      { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 }
+    );
+  }
   
-  const addDownloadToHistory = () => {
+  const addDownloadToHistory = (job?: Job) => {
+    const entriesToSave = job ? monthlyEntries.filter(e => e.job === job) : monthlyEntries;
+    const summaryToSave = job ? calculateSummaryForJob(job) : monthlySummary;
+
     const newHistoryEntry: DownloadHistoryEntry = {
         id: new Date().toISOString(),
         userName: userName,
         monthName: monthName,
         downloadDate: new Date(),
-        entries: monthlyEntries,
-        monthlySummary: monthlySummary,
+        entries: entriesToSave,
+        monthlySummary: summaryToSave,
         overtimeOption: overtimeOption,
+        job: job,
     };
     const history = JSON.parse(localStorage.getItem('download-history') || '[]');
     history.push(newHistoryEntry);
     localStorage.setItem('download-history', JSON.stringify(history));
   }
 
-  const handleExportPDF = () => {
-    if (pdfGeneratorRef.current) {
-      pdfGeneratorRef.current.handleExportPDF();
-      addDownloadToHistory();
-    }
-  };
-
-  const handleShare = () => {
-    if (pdfGeneratorRef.current) {
-      pdfGeneratorRef.current.handleShare();
-      addDownloadToHistory();
-    }
-  };
+  const prepareAndExecute = (action: 'export' | 'share', job: Job) => {
+    const jobEntries = monthlyEntries.filter(e => e.job === job);
+    const jobSummary = calculateSummaryForJob(job);
+    
+    setPdfData({ entries: jobEntries, summary: jobSummary, job: job });
+    
+    setTimeout(() => {
+        if (pdfGeneratorRef.current) {
+            if (action === 'export') {
+                pdfGeneratorRef.current.handleExportPDF();
+            } else {
+                pdfGeneratorRef.current.handleShare();
+            }
+            addDownloadToHistory(job);
+        }
+    }, 100); // Timeout to allow state to update and re-render PDF generator
+  }
 
 
   if (entries.length === 0) {
@@ -108,6 +148,9 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
     );
   }
   
+  const hasJob1Entries = monthlyEntries.some(e => e.job === 'job1');
+  const hasJob2Entries = monthlyEntries.some(e => e.job === 'job2');
+
   return (
     <>
     <Card className="w-full shadow-lg animate-in fade-in-50">
@@ -117,15 +160,40 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
           <CardDescription>{t.recentWorkHours}</CardDescription>
         </div>
         <div className="flex gap-2">
-            <Button onClick={handleExportPDF} variant="outline" disabled={monthlyEntries.length === 0}>
-                <FileType2 className="mr-2 h-4 w-4" />
-                {t.exportPdf}
-            </Button>
-            {navigator.share && (
-                <Button onClick={handleShare} variant="outline" disabled={monthlyEntries.length === 0}>
-                    <Share2 className="mr-2 h-4 w-4" />
-                    {t.share}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" disabled={!hasJob1Entries && !hasJob2Entries}>
+                  <FileType2 className="mr-2 h-4 w-4" />
+                  {t.exportPdf}
                 </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => prepareAndExecute('export', 'job1')} disabled={!hasJob1Entries}>
+                  {t.exportFor} {t.job1}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => prepareAndExecute('export', 'job2')} disabled={!hasJob2Entries}>
+                  {t.exportFor} {t.job2}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {navigator.share && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                   <Button variant="outline" disabled={!hasJob1Entries && !hasJob2Entries}>
+                      <Share2 className="mr-2 h-4 w-4" />
+                      {t.share}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => prepareAndExecute('share', 'job1')} disabled={!hasJob1Entries}>
+                     {t.shareFor} {t.job1}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => prepareAndExecute('share', 'job2')} disabled={!hasJob2Entries}>
+                     {t.shareFor} {t.job2}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
         </div>
       </CardHeader>
@@ -251,9 +319,10 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
         ref={pdfGeneratorRef}
         userName={userName}
         monthName={monthName}
-        monthlyEntries={monthlyEntries}
-        monthlySummary={monthlySummary}
+        monthlyEntries={pdfData?.entries || []}
+        monthlySummary={pdfData?.summary || {}}
         overtimeOption={overtimeOption}
+        job={pdfData?.job}
     />
     </>
   );

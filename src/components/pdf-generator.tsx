@@ -20,6 +20,7 @@ interface PdfGeneratorProps {
     holidayDays: number;
   };
   overtimeOption: OvertimeOption;
+  job?: Job;
 }
 
 const jobColors: Record<Job, string> = {
@@ -33,6 +34,7 @@ export const PdfGenerator = forwardRef(({
   monthlyEntries = [],
   monthlySummary = { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 },
   overtimeOption,
+  job,
 }: PdfGeneratorProps, ref) => {
   const pdfRef = useRef<HTMLDivElement>(null);
   const { language } = useContext(LanguageContext);
@@ -70,7 +72,7 @@ export const PdfGenerator = forwardRef(({
     handleExportPDF: async () => {
       const pdf = await generatePdfInstance();
       if (pdf) {
-        pdf.save(`stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`);
+        pdf.save(`stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}${job ? `_${t[job].replace(' ', '_')}` : ''}.pdf`);
       }
     },
     handleShare: async () => {
@@ -82,11 +84,13 @@ export const PdfGenerator = forwardRef(({
       const pdf = await generatePdfInstance();
       if (!pdf) return;
 
+      const pdfFileName = `stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}${job ? `_${t[job].replace(' ', '_')}` : ''}.pdf`;
+
       try {
           const pdfBlob = pdf.output('blob');
           const pdfFile = new File(
               [pdfBlob], 
-              `stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`, 
+              pdfFileName,
               { type: 'application/pdf' }
           );
 
@@ -106,11 +110,14 @@ export const PdfGenerator = forwardRef(({
     }
   }));
 
+  const jobTitle = job ? t[job] : '';
+  const title = `${t.timeSheetFor} ${monthName} ${jobTitle ? `- ${jobTitle}` : ''}`
+
   return (
     <div ref={pdfRef} style={{ display: 'none', width: '210mm', minHeight: '297mm', padding: '10mm' }} className="bg-white text-black text-xs">
       <div className="flex justify-between items-center mb-2 pb-1 border-b border-gray-800">
         <h1 className="text-sm font-bold">{userName}</h1>
-        <h2 className="text-sm text-gray-700">{monthName}</h2>
+        <h2 className="text-sm text-gray-700">{title}</h2>
       </div>
       <table className="w-full text-xs border-collapse border border-gray-400">
         <thead>

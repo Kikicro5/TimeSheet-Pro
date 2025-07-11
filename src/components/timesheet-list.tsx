@@ -1,12 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { format } from 'date-fns';
-import { TimeEntry } from '@/types';
+import { hr } from 'date-fns/locale';
+import { TimeEntry, OvertimeOption } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from '@/components/ui/table';
-import { FileDown, Trash2, CalendarDays } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { FileDown, Trash2, CalendarDays, Share2, FileType2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,52 +20,100 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface TimesheetListProps {
   entries: TimeEntry[];
   deleteEntry: (id: string) => void;
+  userName: string;
+  overtimeOption: OvertimeOption;
+  setOvertimeOption: (option: OvertimeOption) => void;
+  monthlySummary: {
+    totalWorkHours: number;
+    totalOvertime: number;
+    totalPause: number;
+  };
 }
 
-export function TimesheetList({ entries, deleteEntry }: TimesheetListProps) {
-  const handleExport = () => {
-    const headers = ['Date', 'Start Time', 'End Time', 'Pause (min)', 'Total Hours', 'Location'];
-    const csvContent = [
-      headers.join(','),
-      ...entries.map(e =>
-        [
-          format(e.date, 'yyyy-MM-dd'),
-          e.startTime,
-          e.endTime,
-          e.pause,
-          e.totalHours.toFixed(2),
-          `"${e.location.replace(/"/g, '""')}"`,
-        ].join(',')
-      ),
-    ].join('\n');
+export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, setOvertimeOption, monthlySummary }: TimesheetListProps) {
+  const pdfRef = useRef<HTMLDivElement>(null);
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `timesheet_${format(new Date(), 'yyyy-MM-dd')}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  const now = new Date();
+  const monthName = format(now, 'LLLL yyyy', { locale: hr });
+
+  const monthlyEntries = useMemo(() => {
+    return entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entryDate.getMonth() === now.getMonth() && entryDate.getFullYear() === now.getFullYear();
+    });
+  }, [entries, now]);
+
+  const handleExportPDF = async () => {
+    const input = pdfRef.current;
+    if (!input) return;
+
+    // Temporarily make the hidden div visible for capturing
+    input.style.display = 'block';
+    input.style.position = 'absolute';
+    input.style.left = '-9999px';
+    
+    const canvas = await html2canvas(input, { scale: 2 });
+    
+    // Hide it back
+    input.style.display = 'none';
+    input.style.position = 'static';
+    input.style.left = '0';
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+    const imgX = (pdfWidth - imgWidth * ratio) / 2;
+    const imgY = 15;
+
+    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+    pdf.save(`lista_sati_${userName.replace(' ','_')}_${monthName}.pdf`);
+  };
+
+  const handleShare = async () => {
+    const input = pdfRef.current;
+    if (!input || !navigator.share) {
+      alert('Dijeljenje nije podržano na ovom pregledniku.');
+      return;
+    }
+
+    input.style.display = 'block';
+    input.style.position = 'absolute';
+    input.style.left = '-9999px';
+
+    try {
+        const canvas = await html2canvas(input, { scale: 2 });
+        input.style.display = 'none';
+        input.style.position = 'static';
+        input.style.left = '0';
+
+        canvas.toBlob(async (blob) => {
+            if (!blob) return;
+            const file = new File([blob], `lista_sati_${userName.replace(' ','_')}_${monthName}.png`, { type: 'image/png' });
+            await navigator.share({
+                title: `Lista sati za ${monthName}`,
+                text: `Mjesečna lista sati za ${userName} za ${monthName}.`,
+                files: [file],
+            });
+        }, 'image/png');
+    } catch (error) {
+        console.error('Greška pri dijeljenju:', error);
+        input.style.display = 'none';
+        input.style.position = 'static';
+        input.style.left = '0';
     }
   };
-  
-  const dailyTotals = useMemo(() => {
-    const totals = new Map<string, number>();
-    entries.forEach(entry => {
-      const dateKey = format(entry.date, 'yyyy-MM-dd');
-      const currentTotal = totals.get(dateKey) || 0;
-      totals.set(dateKey, currentTotal + entry.totalHours);
-    });
-    return totals;
-  }, [entries]);
+
 
   if (entries.length === 0) {
     return (
@@ -71,66 +122,77 @@ export function TimesheetList({ entries, deleteEntry }: TimesheetListProps) {
            <div className="mx-auto bg-secondary rounded-full p-4 w-fit">
             <CalendarDays className="h-12 w-12 text-muted-foreground" />
            </div>
-          <CardTitle className="mt-4 text-2xl font-headline">No Entries Yet</CardTitle>
-          <CardDescription>Add your first time entry using the form above.</CardDescription>
+          <CardTitle className="mt-4 text-2xl font-headline">Nema unosa</CardTitle>
+          <CardDescription>Dodajte svoj prvi unos koristeći obrazac iznad.</CardDescription>
         </CardHeader>
       </Card>
     );
   }
   
   return (
+    <>
     <Card className="w-full shadow-lg animate-in fade-in-50">
       <CardHeader className="flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-2xl font-headline">Logged Entries</CardTitle>
-          <CardDescription>A list of your recent work hours.</CardDescription>
+          <CardTitle className="text-2xl font-headline">Zabilježeni unosi</CardTitle>
+          <CardDescription>Popis vaših nedavnih radnih sati.</CardDescription>
         </div>
-        <Button onClick={handleExport} variant="outline" disabled={entries.length === 0}>
-          <FileDown className="mr-2 h-4 w-4" />
-          Export CSV
-        </Button>
+        <div className="flex gap-2">
+            <Button onClick={handleExportPDF} variant="outline" disabled={monthlyEntries.length === 0}>
+                <FileType2 className="mr-2 h-4 w-4" />
+                Izvezi PDF
+            </Button>
+            {navigator.share && (
+                <Button onClick={handleShare} variant="outline" disabled={monthlyEntries.length === 0}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Podijeli
+                </Button>
+            )}
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Start</TableHead>
-              <TableHead>End</TableHead>
-              <TableHead>Pause</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead className="text-right">Total Hours</TableHead>
-              <TableHead className="text-right w-[100px]">Actions</TableHead>
+              <TableHead>Datum</TableHead>
+              <TableHead>Početak</TableHead>
+              <TableHead>Kraj</TableHead>
+              <TableHead>Pauza</TableHead>
+              <TableHead>Lokacija</TableHead>
+              <TableHead className="text-right">Prekovremeni</TableHead>
+              <TableHead className="text-right w-[100px]">Akcije</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {entries.map(entry => (
               <TableRow key={entry.id} className="animate-in fade-in-25">
-                <TableCell className="font-medium">{format(entry.date, 'MMM d, yyyy')}</TableCell>
+                <TableCell className="font-medium">{format(entry.date, 'dd.MM.yyyy')}</TableCell>
                 <TableCell>{entry.startTime}</TableCell>
                 <TableCell>{entry.endTime}</TableCell>
                 <TableCell>{entry.pause} min</TableCell>
                 <TableCell><div className="max-w-[200px] truncate">{entry.location}</div></TableCell>
-                <TableCell className="text-right font-mono">{entry.totalHours.toFixed(2)}h</TableCell>
+                <TableCell className={`text-right font-mono ${entry.overtimeHours >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {entry.overtimeHours.toFixed(2)}h
+                </TableCell>
                 <TableCell className="text-right">
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
                           <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete entry</span>
+                          <span className="sr-only">Izbriši unos</span>
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogTitle>Jeste li sigurni?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete this time entry.
+                          Ova akcija se ne može poništiti. Trajno će izbrisati ovaj unos.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Odustani</AlertDialogCancel>
                         <AlertDialogAction onClick={() => deleteEntry(entry.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                          Delete
+                          Izbriši
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -139,13 +201,94 @@ export function TimesheetList({ entries, deleteEntry }: TimesheetListProps) {
               </TableRow>
             ))}
           </TableBody>
-           {entries.length > 0 && (
-             <TableCaption>
-                Total hours per day: {Array.from(dailyTotals.entries()).map(([date, total]) => `${format(new Date(date), 'MMM d')}: ${total.toFixed(2)}h`).join(', ')}
-             </TableCaption>
-           )}
         </Table>
       </CardContent>
+      <CardFooter className="flex-col items-start gap-4">
+          <div className="w-full">
+            <h3 className="font-bold text-lg mb-2">Mjesečni sažetak ({monthName})</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                <div className="bg-muted p-2 rounded-md">
+                    <p className="text-muted-foreground">Ukupno radnih sati</p>
+                    <p className="font-bold text-base">{monthlySummary.totalWorkHours.toFixed(2)}h</p>
+                </div>
+                <div className="bg-muted p-2 rounded-md">
+                    <p className="text-muted-foreground">Ukupno prekovremenih</p>
+                    <p className={`font-bold text-base ${monthlySummary.totalOvertime >= 0 ? 'text-green-600' : 'text-red-600'}`}>{monthlySummary.totalOvertime.toFixed(2)}h</p>
+                </div>
+                <div className="bg-muted p-2 rounded-md">
+                    <p className="text-muted-foreground">Ukupno pauze</p>
+                    <p className="font-bold text-base">{monthlySummary.totalPause} min</p>
+                </div>
+                 <div className="bg-muted p-2 rounded-md">
+                    <p className="text-muted-foreground">Dani godišnjeg</p>
+                    <p className="font-bold text-base">0</p>
+                </div>
+            </div>
+          </div>
+          <div>
+            <Label className="font-bold">Opcija za prekovremene:</Label>
+             <RadioGroup
+                value={overtimeOption}
+                onValueChange={(value: OvertimeOption) => setOvertimeOption(value)}
+                className="flex items-center gap-4 mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="payout" id="payout" />
+                <Label htmlFor="payout">Isplata</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="keep" id="keep" />
+                <Label htmlFor="keep">Ostaje</Label>
+              </div>
+            </RadioGroup>
+          </div>
+      </CardFooter>
     </Card>
+
+    {/* Hidden div for PDF export */}
+    <div ref={pdfRef} style={{ display: 'none' }} className="p-8 bg-white text-black">
+      <div className="text-center mb-6">
+        <h1 className="text-3xl font-bold">Mjesečna lista sati</h1>
+        <h2 className="text-xl mt-2">{userName}</h2>
+        <h3 className="text-lg text-gray-600">{monthName}</h3>
+      </div>
+      <table className="w-full text-sm border-collapse border border-gray-400">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="border border-gray-300 p-2">Datum</th>
+            <th className="border border-gray-300 p-2">Početak</th>
+            <th className="border border-gray-300 p-2">Kraj</th>
+            <th className="border border-gray-300 p-2">Pauza (min)</th>
+            <th className="border border-gray-300 p-2">Radni sati</th>
+            <th className="border border-gray-300 p-2">Prekovremeni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {monthlyEntries.map(entry => (
+            <tr key={entry.id} className="text-center">
+              <td className="border border-gray-300 p-2">{format(entry.date, 'dd.MM.yyyy')}</td>
+              <td className="border border-gray-300 p-2">{entry.startTime}</td>
+              <td className="border border-gray-300 p-2">{entry.endTime}</td>
+              <td className="border border-gray-300 p-2">{entry.pause}</td>
+              <td className="border border-gray-300 p-2">{entry.totalHours.toFixed(2)}h</td>
+              <td className="border border-gray-300 p-2">{entry.overtimeHours.toFixed(2)}h</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-6 border-t pt-4">
+        <h3 className="text-xl font-bold mb-2">Sažetak</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <p><strong>Ukupno radnih sati:</strong> {monthlySummary.totalWorkHours.toFixed(2)}h</p>
+          <p><strong>Ukupno prekovremenih:</strong> {monthlySummary.totalOvertime.toFixed(2)}h</p>
+          <p><strong>Ukupno pauze:</strong> {monthlySummary.totalPause} min</p>
+          <p><strong>Dani godišnjeg:</strong> 0</p>
+        </div>
+      </div>
+       <div className="mt-4">
+         <p><strong>Opcija za prekovremene:</strong> {overtimeOption === 'payout' ? 'Isplata' : 'Ostaje'}</p>
+       </div>
+    </div>
+    </>
   );
 }

@@ -22,13 +22,6 @@ const formSchema = z.object({
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:mm)'),
   pause: z.coerce.number().min(0, 'Pause cannot be negative.'),
   location: z.string().min(1, 'Location is required.'),
-}).refine(data => {
-    const start = new Date(`1970-01-01T${data.startTime}:00`);
-    const end = new Date(`1970-01-01T${data.endTime}:00`);
-    return end.getTime() > start.getTime();
-}, {
-  message: "End time must be after start time for same-day entries.",
-  path: ["endTime"],
 });
 
 type TimesheetFormValues = z.infer<typeof formSchema>;
@@ -45,9 +38,9 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       date: new Date(),
-      startTime: '09:00',
-      endTime: '17:00',
-      pause: 30,
+      startTime: '07:00',
+      endTime: '16:00',
+      pause: 60,
       location: '',
     },
   });
@@ -81,8 +74,11 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
     })
     form.reset({
         ...data,
-        location: '', // reset location for next entry
-        startTime: data.endTime, // set next start time to previous end time
+        date: new Date(),
+        startTime: '07:00',
+        endTime: '16:00',
+        pause: 60,
+        location: '', 
     });
   }
 

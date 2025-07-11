@@ -6,4 +6,7 @@ export interface TimeEntry {
   pause: number; // in minutes
   location: string;
   totalHours: number;
+  overtimeHours: number;
 }
+
+export type OvertimeOption = 'payout' | 'keep';

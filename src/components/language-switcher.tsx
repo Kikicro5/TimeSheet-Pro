@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LanguageContext, Language } from '@/contexts/LanguageContext';
-import { Globe } from 'lucide-react';
+import { Flag } from 'lucide-react';
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useContext(LanguageContext);
@@ -22,7 +22,7 @@ export function LanguageSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-          <Globe className="h-[1.2rem] w-[1.2rem]" />
+          <Flag className="h-[1.2rem] w-[1.2rem]" />
           <span className="sr-only">Toggle language</span>
         </Button>
       </DropdownMenuTrigger>

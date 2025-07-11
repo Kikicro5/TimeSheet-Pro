@@ -222,9 +222,9 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-4">
+      <CardFooter className="flex-col items-center gap-4">
           <div className="w-full">
-            <h3 className="font-bold text-lg mb-2">Mjesečni sažetak ({monthName})</h3>
+            <h3 className="font-bold text-lg mb-2 text-center">Mjesečni sažetak ({monthName})</h3>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
                 <div className="bg-muted p-2 rounded-md">
                     <p className="text-muted-foreground">Ukupno radnih sati</p>
@@ -248,7 +248,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                 </div>
             </div>
           </div>
-          <div>
+          <div className="flex flex-col items-center mt-4">
             <Label className="font-bold">Opcija za prekovremene:</Label>
              <RadioGroup
                 value={overtimeOption}

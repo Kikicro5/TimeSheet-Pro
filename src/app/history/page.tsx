@@ -35,7 +35,7 @@ const locales: { [key: string]: Locale } = { de, en: enUS };
 export default function HistoryPage() {
   const [history, setHistory] = useState<DownloadHistoryEntry[]>([]);
   const [isClient, setIsClient] = useState(false);
-  const pdfGeneratorRef = useRef<Record<string, HistoryPdfGeneratorHandles>>({});
+  const pdfGeneratorRefs = useRef<Record<string, HistoryPdfGeneratorHandles | null>>({});
   const { language } = useContext(LanguageContext);
   const t = translations[language];
   const locale = locales[language] || enUS;
@@ -65,11 +65,11 @@ export default function HistoryPage() {
   }
 
   const handleExport = (id: string) => {
-    pdfGeneratorRef.current[id]?.handleExportPDF();
+    pdfGeneratorRefs.current[id]?.handleExportPDF();
   };
 
   const handleShare = (id: string) => {
-    pdfGeneratorRef.current[id]?.handleShare();
+    pdfGeneratorRefs.current[id]?.handleShare();
   };
 
   const getJobBadgeVariant = (job?: Job): "default" | "secondary" => {
@@ -205,11 +205,7 @@ export default function HistoryPage() {
     {history.map(entry => (
         <PdfGenerator
           key={entry.id}
-          ref={el => {
-              if (el) {
-                  pdfGeneratorRef.current[entry.id] = el;
-              }
-          }}
+          ref={el => { pdfGeneratorRefs.current[entry.id] = el; }}
           userName={entry.userName}
           monthName={format(new Date(entry.downloadDate), 'LLLL yyyy', { locale })}
           monthlyEntries={entry.entries}

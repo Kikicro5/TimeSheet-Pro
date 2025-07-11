@@ -28,14 +28,14 @@ const jobColors: Record<Job, string> = {
     job2: '#dcfce7', // green-100
 };
 
-export const PdfGenerator = forwardRef(({
+export const PdfGenerator = forwardRef<unknown, PdfGeneratorProps>(({
   userName,
   monthName,
   monthlyEntries = [],
   monthlySummary = { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 },
   overtimeOption,
   job,
-}: PdfGeneratorProps, ref) => {
+}, ref) => {
   const pdfRef = useRef<HTMLDivElement>(null);
   const { language } = useContext(LanguageContext);
   const t = translations[language];
@@ -44,13 +44,16 @@ export const PdfGenerator = forwardRef(({
       const input = pdfRef.current;
       if (!input) return null;
 
+      // Temporarily show the element to render it
+      const originalDisplay = input.style.display;
       input.style.display = 'block';
       input.style.position = 'absolute';
       input.style.left = '-9999px';
       
       const canvas = await html2canvas(input, { scale: 2 });
       
-      input.style.display = 'none';
+      // Hide it again
+      input.style.display = originalDisplay;
       input.style.position = 'static';
       input.style.left = '0';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useContext, useState, useEffect } from 'react';
+import { useMemo, useRef, useContext } from 'react';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { TimeEntry, OvertimeOption, DownloadHistoryEntry, Job } from '@/types';
@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { FileDown, Trash2, CalendarDays, Share2, FileType2 } from 'lucide-react';
+import { Trash2, CalendarDays, Share2, FileType2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,11 +61,10 @@ const jobRowColors: Record<Job, string> = {
 };
 
 export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, setOvertimeOption, monthlySummary }: TimesheetListProps) {
-  const pdfGeneratorRef = useRef<PdfGeneratorHandles>(null);
+  const pdfGeneratorRefs = useRef<Record<Job, PdfGeneratorHandles | null>>({ job1: null, job2: null });
   const { language } = useContext(LanguageContext);
   const t = translations[language];
   const locale = locales[language] || enUS;
-  const [pdfData, setPdfData] = useState<{ entries: TimeEntry[], summary: any, job?: Job } | null>(null);
 
   const now = new Date();
   const monthName = format(now, 'LLLL yyyy', { locale });
@@ -115,31 +114,17 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
     localStorage.setItem('download-history', JSON.stringify(history));
   }
 
-  const prepareAndExecute = (action: 'export' | 'share', job: Job) => {
-    const jobEntries = monthlyEntries.filter(e => e.job === job);
-    const jobSummary = calculateSummaryForJob(job);
-    
-    setPdfData({ entries: jobEntries, summary: jobSummary, job: job });
-    
-    // The useEffect below will handle the execution
-  }
-
-  useEffect(() => {
-    if (pdfData && pdfGeneratorRef.current) {
-      // Find the action from a button that might have triggered this
-      const action = (window as any)._pdfAction;
+  const handleAction = (action: 'export' | 'share', job: Job) => {
+    addDownloadToHistory(job);
+    const generator = pdfGeneratorRefs.current[job];
+    if (generator) {
       if (action === 'export') {
-        pdfGeneratorRef.current.handleExportPDF();
+        generator.handleExportPDF();
       } else if (action === 'share') {
-        pdfGeneratorRef.current.handleShare();
+        generator.handleShare();
       }
-      addDownloadToHistory(pdfData.job);
-      
-      // Clean up
-      setPdfData(null); 
-      delete (window as any)._pdfAction;
     }
-  }, [pdfData]);
+  };
 
 
   if (entries.length === 0) {
@@ -158,11 +143,6 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
   
   const hasJob1Entries = monthlyEntries.some(e => e.job === 'job1');
   const hasJob2Entries = monthlyEntries.some(e => e.job === 'job2');
-  
-  const handleActionClick = (action: 'export' | 'share', job: Job) => {
-      (window as any)._pdfAction = action;
-      prepareAndExecute(action, job);
-  }
 
   return (
     <>
@@ -181,10 +161,10 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => handleActionClick('export', 'job1')} disabled={!hasJob1Entries}>
+                <DropdownMenuItem onClick={() => handleAction('export', 'job1')} disabled={!hasJob1Entries}>
                   {t.exportFor} {t.job1}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleActionClick('export', 'job2')} disabled={!hasJob2Entries}>
+                <DropdownMenuItem onClick={() => handleAction('export', 'job2')} disabled={!hasJob2Entries}>
                   {t.exportFor} {t.job2}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -199,10 +179,10 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => handleActionClick('share', 'job1')} disabled={!hasJob1Entries}>
+                  <DropdownMenuItem onClick={() => handleAction('share', 'job1')} disabled={!hasJob1Entries}>
                      {t.shareFor} {t.job1}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleActionClick('share', 'job2')} disabled={!hasJob2Entries}>
+                  <DropdownMenuItem onClick={() => handleAction('share', 'job2')} disabled={!hasJob2Entries}>
                      {t.shareFor} {t.job2}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -329,13 +309,22 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
     </Card>
 
     <PdfGenerator
-        ref={pdfGeneratorRef}
+        ref={el => pdfGeneratorRefs.current.job1 = el}
         userName={userName}
         monthName={monthName}
-        monthlyEntries={pdfData?.entries || []}
-        monthlySummary={pdfData?.summary || { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 }}
+        monthlyEntries={monthlyEntries.filter(e => e.job === 'job1')}
+        monthlySummary={calculateSummaryForJob('job1')}
         overtimeOption={overtimeOption}
-        job={pdfData?.job}
+        job='job1'
+    />
+    <PdfGenerator
+        ref={el => pdfGeneratorRefs.current.job2 = el}
+        userName={userName}
+        monthName={monthName}
+        monthlyEntries={monthlyEntries.filter(e => e.job === 'job2')}
+        monthlySummary={calculateSummaryForJob('job2')}
+        overtimeOption={overtimeOption}
+        job='job2'
     />
     </>
   );

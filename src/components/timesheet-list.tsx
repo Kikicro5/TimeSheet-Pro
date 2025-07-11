@@ -46,7 +46,6 @@ const locales: { [key: string]: Locale } = { de, en: enUS };
 const jobRowColors: Record<Job, string> = {
     job1: 'bg-blue-50 hover:bg-blue-100',
     job2: 'bg-green-50 hover:bg-green-100',
-    job3: 'bg-amber-50 hover:bg-amber-100',
 };
 
 export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, setOvertimeOption, monthlySummary }: TimesheetListProps) {

@@ -25,7 +25,6 @@ interface PdfGeneratorProps {
 const jobColors: Record<Job, string> = {
     job1: '#e0f2fe', // blue-100
     job2: '#dcfce7', // green-100
-    job3: '#fef3c7', // amber-100
 };
 
 export const PdfGenerator = forwardRef(({

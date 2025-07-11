@@ -26,7 +26,7 @@ const formSchema = z.object({
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:mm)'),
   pause: z.coerce.number().min(0, 'Pause cannot be negative.'),
   location: z.string().min(1, 'Location is required.'),
-  job: z.enum(['job1', 'job2', 'job3'], { required_error: "You need to select a job." }),
+  job: z.enum(['job1', 'job2'], { required_error: "You need to select a job." }),
 });
 
 type TimesheetFormValues = z.infer<typeof formSchema>;
@@ -40,13 +40,11 @@ interface TimesheetFormProps {
 const jobColors: Record<Job, string> = {
     job1: 'bg-blue-100 hover:bg-blue-200 border-blue-200',
     job2: 'bg-green-100 hover:bg-green-200 border-green-200',
-    job3: 'bg-amber-100 hover:bg-amber-200 border-amber-200',
 };
 
 const jobTextColors: Record<Job, string> = {
     job1: 'text-blue-800',
     job2: 'text-green-800',
-    job3: 'text-amber-800',
 };
 
 
@@ -151,9 +149,9 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="grid grid-cols-3 gap-4"
+                      className="grid grid-cols-2 gap-4"
                     >
-                      {(['job1', 'job2', 'job3'] as Job[]).map((job) => (
+                      {(['job1', 'job2'] as Job[]).map((job) => (
                           <FormItem key={job} className="flex-1">
                             <FormControl>
                               <RadioGroupItem value={job} className="sr-only" />

@@ -30,6 +30,7 @@ export const translations = {
     saveEntry: 'Eintrag speichern',
     entryAdded: 'Eintrag hinzugefügt',
     workOn: 'Arbeit am',
+    for: 'für',
     hasBeenLogged: 'wurde protokolliert',
     vacationAdded: 'Urlaub hinzugefügt',
     holidayAdded: 'Feiertag hinzugefügt',
@@ -42,7 +43,6 @@ export const translations = {
     job: 'Auftrag',
     job1: 'Auftrag 1',
     job2: 'Auftrag 2',
-    job3: 'Auftrag 3',
 
     // Timesheet List
     loggedEntries: 'Protokollierte Einträge',
@@ -82,7 +82,6 @@ export const translations = {
     sharingNotSupported: 'Teilen wird in diesem Browser nicht unterstützt.',
     timeSheetFor: 'Stundenzettel für',
     monthlyTimeSheetFor: 'Monatlicher Stundenzettel für',
-    for: 'für',
     sharingPdfNotSupported: 'Das Teilen von PDF-Dateien wird auf diesem Gerät nicht unterstützt.',
     sharingError: 'Beim Versuch zu teilen ist ein Fehler aufgetreten.',
 
@@ -121,6 +120,7 @@ export const translations = {
     saveEntry: 'Save Entry',
     entryAdded: 'Entry Added',
     workOn: 'Work on',
+    for: 'for',
     hasBeenLogged: 'has been logged',
     vacationAdded: 'Vacation Added',
     holidayAdded: 'Holiday Added',
@@ -133,7 +133,6 @@ export const translations = {
     job: 'Job',
     job1: 'Job 1',
     job2: 'Job 2',
-    job3: 'Job 3',
 
     // Timesheet List
     loggedEntries: 'Logged Entries',
@@ -173,7 +172,6 @@ export const translations = {
     sharingNotSupported: 'Sharing is not supported on this browser.',
     timeSheetFor: 'Timesheet for',
     monthlyTimeSheetFor: 'Monthly timesheet for',
-    for: 'for',
     sharingPdfNotSupported: 'Sharing PDF files is not supported on this device.',
     sharingError: 'An error occurred while trying to share.',
     

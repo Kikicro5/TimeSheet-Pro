@@ -269,11 +269,10 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
     </Card>
 
     {/* Hidden div for PDF export */}
-    <div ref={pdfRef} style={{ display: 'none' }} className="p-8 bg-white text-black">
-      <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold">Mjesečna lista sati</h1>
-        <h2 className="text-xl mt-2">{userName}</h2>
-        <h3 className="text-lg text-gray-600">{monthName}</h3>
+    <div ref={pdfRef} style={{ display: 'none' }} className="p-8 bg-white text-black text-base">
+      <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-gray-800">
+        <h1 className="text-xl font-bold">{userName}</h1>
+        <h2 className="text-xl text-gray-700">{monthName}</h2>
       </div>
       <table className="w-full text-sm border-collapse border border-gray-400">
         <thead>
@@ -320,16 +319,15 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
         </tbody>
       </table>
       <div className="mt-6 border-t pt-4">
-        <h3 className="text-xl font-bold mb-2">Sažetak</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <p><strong>Ukupno radnih sati:</strong> {monthlySummary.totalWorkHours.toFixed(2)}h</p>
-          <p><strong>Ukupno prekovremenih:</strong> {monthlySummary.totalOvertime.toFixed(2)}h</p>
-          <p><strong>Ukupno pauze:</strong> {monthlySummary.totalPause} min</p>
-          <p><strong>Dani godišnjeg:</strong> {monthlySummary.vacationDays}</p>
-          <p><strong>Praznici:</strong> {monthlySummary.holidayDays}</p>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+          <div className="flex justify-between"><p>Ukupno radnih sati:</p> <p className="font-bold">{monthlySummary.totalWorkHours.toFixed(2)}h</p></div>
+          <div className="flex justify-between"><p>Ukupno prekovremenih:</p> <p className="font-bold">{monthlySummary.totalOvertime.toFixed(2)}h</p></div>
+          <div className="flex justify-between"><p>Ukupno pauze:</p> <p className="font-bold">{monthlySummary.totalPause} min</p></div>
+          <div className="flex justify-between"><p>Dani godišnjeg:</p> <p className="font-bold">{monthlySummary.vacationDays}</p></div>
+          <div className="flex justify-between"><p>Praznici:</p> <p className="font-bold">{monthlySummary.holidayDays}</p></div>
         </div>
       </div>
-       <div className="mt-4">
+       <div className="mt-4 pt-2 border-t">
          <p><strong>Opcija za prekovremene:</strong> {overtimeOption === 'payout' ? 'Isplata' : 'Ostaje'}</p>
        </div>
     </div>

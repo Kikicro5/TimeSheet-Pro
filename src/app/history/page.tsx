@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import Link from 'next/link';
 import { DownloadHistoryEntry } from '@/types';
 import { format } from 'date-fns';
-import { hr } from 'date-fns/locale';
+import { hr, de } from 'date-fns/locale';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { PdfGenerator } from '@/components/pdf-generator';
+import { LanguageContext } from '@/contexts/LanguageContext';
+import { translations } from '@/lib/translations';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 interface HistoryPdfGeneratorHandles {
     handleExportPDF: () => void;
@@ -31,6 +34,9 @@ export default function HistoryPage() {
   const [history, setHistory] = useState<DownloadHistoryEntry[]>([]);
   const [isClient, setIsClient] = useState(false);
   const pdfGeneratorRef = useRef<Record<string, HistoryPdfGeneratorHandles>>({});
+  const { language } = useContext(LanguageContext);
+  const t = translations[language];
+  const locale = language === 'hr' ? hr : de;
 
   useEffect(() => {
     setIsClient(true);
@@ -39,7 +45,6 @@ export default function HistoryPage() {
       const parsedHistory = JSON.parse(savedHistory).map((h: any) => ({
         ...h,
         downloadDate: new Date(h.downloadDate),
-        // Ensure nested date objects are correctly parsed, only if entries exist
         entries: h.entries ? h.entries.map((e: any) => ({ ...e, date: new Date(e.date) })) : []
       }));
       setHistory(parsedHistory.sort((a: any, b: any) => b.downloadDate.getTime() - a.downloadDate.getTime()));
@@ -77,17 +82,18 @@ export default function HistoryPage() {
             <Button asChild variant="ghost" className="hover:bg-primary/90">
                 <Link href="/">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Natrag na početnu
+                    {t.backToHome}
                 </Link>
             </Button>
-            <h1 className="text-2xl font-bold font-headline">Povijest preuzimanja</h1>
+            <h1 className="text-2xl font-bold font-headline">{t.downloadHistory}</h1>
+            <LanguageSwitcher />
         </div>
       </header>
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <Card className="w-full shadow-lg">
           <CardHeader>
-            <CardTitle>Evidencija preuzimanja</CardTitle>
-            <CardDescription>Ovdje se nalazi popis svih preuzetih i podijeljenih mjesečnih lista.</CardDescription>
+            <CardTitle>{t.downloadRecords}</CardTitle>
+            <CardDescription>{t.historyDescription}</CardDescription>
           </CardHeader>
           <CardContent>
             {history.length > 0 ? (
@@ -95,10 +101,10 @@ export default function HistoryPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Mjesec</TableHead>
-                    <TableHead>Ime i prezime</TableHead>
-                    <TableHead>Datum preuzimanja</TableHead>
-                    <TableHead className="text-right">Akcije</TableHead>
+                    <TableHead>{t.month}</TableHead>
+                    <TableHead>{t.nameAndSurname}</TableHead>
+                    <TableHead>{t.downloadDate}</TableHead>
+                    <TableHead className="text-right">{t.actions}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -106,34 +112,34 @@ export default function HistoryPage() {
                     <TableRow key={entry.id}>
                       <TableCell className="font-medium">{entry.monthName}</TableCell>
                       <TableCell>{entry.userName}</TableCell>
-                      <TableCell>{format(entry.downloadDate, "dd.MM.yyyy 'u' HH:mm", { locale: hr })}</TableCell>
+                      <TableCell>{format(entry.downloadDate, `dd.MM.yyyy '${language === 'hr' ? 'u' : 'um'}' HH:mm`, { locale })}</TableCell>
                        <TableCell className="text-right">
                           <Button variant="ghost" size="icon" onClick={() => handleExport(entry.id)} className="text-muted-foreground hover:text-primary">
                               <FileType2 className="h-4 w-4" />
-                              <span className="sr-only">Izvezi PDF</span>
+                              <span className="sr-only">{t.exportPdf}</span>
                           </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleShare(entry.id)} className="text-muted-foreground hover:text-primary">
                               <Share2 className="h-4 w-4" />
-                              <span className="sr-only">Podijeli</span>
+                              <span className="sr-only">{t.share}</span>
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
                                   <Trash2 className="h-4 w-4" />
-                                  <span className="sr-only">Izbriši unos</span>
+                                  <span className="sr-only">{t.deleteEntry}</span>
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Jeste li sigurni?</AlertDialogTitle>
+                                <AlertDialogTitle>{t.areYouSure}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Ova akcija će trajno izbrisati ovaj zapis iz povijesti.
+                                  {t.deleteEntryConfirm}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Odustani</AlertDialogCancel>
+                                <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => deleteHistoryEntry(entry.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                  Izbriši
+                                  {t.delete}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -148,20 +154,20 @@ export default function HistoryPage() {
                         <AlertDialogTrigger asChild>
                              <Button variant="destructive">
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                Očisti povijest
+                                {t.clearHistory}
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                                <AlertDialogTitle>Očistiti cijelu povijest?</AlertDialogTitle>
+                                <AlertDialogTitle>{t.clearHistoryConfirmTitle}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    Ova akcija se ne može poništiti. Trajno će izbrisati sve zapise o preuzimanju.
+                                    {t.clearHistoryConfirm}
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                              <AlertDialogFooter>
-                                <AlertDialogCancel>Odustani</AlertDialogCancel>
+                                <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
                                 <AlertDialogAction onClick={clearHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                  Očisti
+                                  {t.clear}
                                 </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
@@ -173,8 +179,8 @@ export default function HistoryPage() {
                  <div className="mx-auto bg-secondary rounded-full p-4 w-fit">
                     <DownloadCloud className="h-12 w-12 text-muted-foreground" />
                 </div>
-                <h3 className="mt-4 text-xl font-semibold">Nema zapisa</h3>
-                <p className="text-muted-foreground">Još niste preuzeli nijednu listu.</p>
+                <h3 className="mt-4 text-xl font-semibold">{t.noRecords}</h3>
+                <p className="text-muted-foreground">{t.noDownloadsYet}</p>
               </div>
             )}
           </CardContent>

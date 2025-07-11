@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useContext } from 'react';
 import type { TimeEntry, OvertimeOption } from '@/types';
 import { TimesheetForm } from '@/components/timesheet-form';
 import { TimesheetList } from '@/components/timesheet-list';
@@ -9,6 +9,9 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { LanguageContext } from '@/contexts/LanguageContext';
+import { translations } from '@/lib/translations';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
@@ -16,6 +19,8 @@ export default function Home() {
   const [userName, setUserName] = useState('John Doe'); // Example user name
   const [overtimeOption, setOvertimeOption] = useState<OvertimeOption>('keep');
   const { toast } = useToast();
+  const { language } = useContext(LanguageContext);
+  const t = translations[language];
 
   useEffect(() => {
     setIsClient(true);
@@ -47,8 +52,8 @@ export default function Home() {
     if (dateExists) {
         toast({
             variant: 'destructive',
-            title: 'Greška pri unosu',
-            description: `Unos za datum ${format(entry.date, 'dd.MM.yyyy')} već postoji.`,
+            title: t.error,
+            description: `${t.entryExistsError} ${format(entry.date, 'dd.MM.yyyy')}.`,
         });
         return;
     }
@@ -60,7 +65,7 @@ export default function Home() {
             startTime: '',
             endTime: '',
             pause: 0,
-            location: entry.isVacation ? 'Godišnji odmor' : 'Praznik',
+            location: entry.isVacation ? t.vacation : t.holiday,
             totalHours: 0,
             overtimeHours: 0,
         };
@@ -129,16 +134,17 @@ export default function Home() {
                 <div className="flex items-center gap-2 text-lg">
                   <PiggyBank className="h-6 w-6" />
                   <span>
-                    Prekovremeni: {monthlySummary.totalOvertime.toFixed(2)}h
+                    {t.overtime}: {monthlySummary.totalOvertime.toFixed(2)}h
                   </span>
                 </div>
              )}
              <Button asChild variant="outline" size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                 <Link href="/history">
                     <History className="mr-2 h-4 w-4" />
-                    Povijest
+                    {t.history}
                 </Link>
              </Button>
+             <LanguageSwitcher />
           </div>
         </div>
       </header>

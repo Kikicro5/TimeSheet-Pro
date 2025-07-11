@@ -1,10 +1,12 @@
 'use client';
 
-import { useRef, forwardRef, useImperativeHandle } from 'react';
+import { useRef, forwardRef, useImperativeHandle, useContext } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { format } from 'date-fns';
 import { TimeEntry, OvertimeOption } from '@/types';
+import { LanguageContext } from '@/contexts/LanguageContext';
+import { translations } from '@/lib/translations';
 
 interface PdfGeneratorProps {
   userName: string;
@@ -28,6 +30,8 @@ export const PdfGenerator = forwardRef(({
   overtimeOption,
 }: PdfGeneratorProps, ref) => {
   const pdfRef = useRef<HTMLDivElement>(null);
+  const { language } = useContext(LanguageContext);
+  const t = translations[language];
 
   const generatePdfInstance = async () => {
       const input = pdfRef.current;
@@ -61,12 +65,12 @@ export const PdfGenerator = forwardRef(({
     handleExportPDF: async () => {
       const pdf = await generatePdfInstance();
       if (pdf) {
-        pdf.save(`lista_sati_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`);
+        pdf.save(`stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`);
       }
     },
     handleShare: async () => {
       if (!navigator.share) {
-        alert('Dijeljenje nije podržano na ovom pregledniku.');
+        alert(t.sharingNotSupported);
         return;
       }
       
@@ -77,22 +81,22 @@ export const PdfGenerator = forwardRef(({
           const pdfBlob = pdf.output('blob');
           const pdfFile = new File(
               [pdfBlob], 
-              `lista_sati_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`, 
+              `stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`, 
               { type: 'application/pdf' }
           );
 
           if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
               await navigator.share({
-                  title: `Lista sati za ${monthName}`,
-                  text: `Mjesečna lista sati za ${userName} za ${monthName}.`,
+                  title: `${t.timeSheetFor} ${monthName}`,
+                  text: `${t.monthlyTimeSheetFor} ${userName} ${t.for} ${monthName}.`,
                   files: [pdfFile],
               });
           } else {
-             alert('Dijeljenje PDF datoteka nije podržano na ovom uređaju.');
+             alert(t.sharingPdfNotSupported);
           }
       } catch (error) {
-          console.error('Greška pri dijeljenju:', error);
-          alert('Došlo je do greške prilikom pokušaja dijeljenja.');
+          console.error('Sharing error:', error);
+          alert(t.sharingError);
       }
     }
   }));
@@ -106,12 +110,12 @@ export const PdfGenerator = forwardRef(({
       <table className="w-full text-xs border-collapse border border-gray-400">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border border-gray-300 p-1 align-middle">Datum</th>
-            <th className="border border-gray-300 p-1 align-middle">Početak</th>
-            <th className="border border-gray-300 p-1 align-middle">Kraj</th>
-            <th className="border border-gray-300 p-1 align-middle">Pauza (min)</th>
-            <th className="border border-gray-300 p-1 align-middle">Radni sati</th>
-            <th className="border border-gray-300 p-1 align-middle">Prekovremeni</th>
+            <th className="border border-gray-300 p-1 align-middle">{t.date}</th>
+            <th className="border border-gray-300 p-1 align-middle">{t.startTime}</th>
+            <th className="border border-gray-300 p-1 align-middle">{t.endTime}</th>
+            <th className="border border-gray-300 p-1 align-middle">{t.pausePdf}</th>
+            <th className="border border-gray-300 p-1 align-middle">{t.workHours}</th>
+            <th className="border border-gray-300 p-1 align-middle">{t.overtime}</th>
           </tr>
         </thead>
         <tbody>
@@ -120,7 +124,7 @@ export const PdfGenerator = forwardRef(({
                 return (
                     <tr key={entry.id} className="text-center bg-blue-100">
                         <td className="border border-gray-300 p-1 align-middle">{format(new Date(entry.date), 'dd.MM.yyyy')}</td>
-                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold align-middle">Godišnji odmor</td>
+                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold align-middle">{t.vacation}</td>
                     </tr>
                 )
             }
@@ -128,7 +132,7 @@ export const PdfGenerator = forwardRef(({
                 return (
                     <tr key={entry.id} className="text-center bg-green-100">
                         <td className="border border-gray-300 p-1 align-middle">{format(new Date(entry.date), 'dd.MM.yyyy')}</td>
-                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold align-middle">Praznik</td>
+                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold align-middle">{t.holiday}</td>
                     </tr>
                 )
             }
@@ -149,15 +153,15 @@ export const PdfGenerator = forwardRef(({
       </table>
       <div className="mt-4 pt-2 border-t">
         <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-          <div className="flex justify-between"><p>Ukupno radnih sati:</p> <p className="font-bold">{monthlySummary.totalWorkHours.toFixed(2)}h</p></div>
-          <div className="flex justify-between"><p>Ukupno prekovremenih:</p> <p className="font-bold">{monthlySummary.totalOvertime.toFixed(2)}h</p></div>
-          <div className="flex justify-between"><p>Ukupno pauze:</p> <p className="font-bold">{monthlySummary.totalPause} min</p></div>
-          <div className="flex justify-between"><p>Dani godišnjeg:</p> <p className="font-bold">{monthlySummary.vacationDays}</p></div>
-          <div className="flex justify-between"><p>Praznici:</p> <p className="font-bold">{monthlySummary.holidayDays}</p></div>
+          <div className="flex justify-between"><p>{t.totalWorkHours}:</p> <p className="font-bold">{monthlySummary.totalWorkHours.toFixed(2)}h</p></div>
+          <div className="flex justify-between"><p>{t.totalOvertime}:</p> <p className="font-bold">{monthlySummary.totalOvertime.toFixed(2)}h</p></div>
+          <div className="flex justify-between"><p>{t.totalPause}:</p> <p className="font-bold">{monthlySummary.totalPause} min</p></div>
+          <div className="flex justify-between"><p>{t.vacationDays}:</p> <p className="font-bold">{monthlySummary.vacationDays}</p></div>
+          <div className="flex justify-between"><p>{t.holidays}:</p> <p className="font-bold">{monthlySummary.holidayDays}</p></div>
         </div>
       </div>
        <div className="mt-2 pt-1 border-t">
-         <p><strong>Prekovremeni:</strong> {overtimeOption === 'payout' ? 'Isplata' : 'Ostaje'}</p>
+         <p><strong>{t.overtime}:</strong> {overtimeOption === 'payout' ? t.payout : t.keep}</p>
        </div>
     </div>
   );

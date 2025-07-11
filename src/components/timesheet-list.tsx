@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useContext } from 'react';
 import { format } from 'date-fns';
-import { hr } from 'date-fns/locale';
+import { hr, de } from 'date-fns/locale';
 import { TimeEntry, OvertimeOption, DownloadHistoryEntry } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -22,6 +22,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { PdfGenerator } from './pdf-generator';
+import { LanguageContext } from '@/contexts/LanguageContext';
+import { translations } from '@/lib/translations';
 
 interface TimesheetListProps {
   entries: TimeEntry[];
@@ -40,9 +42,12 @@ interface TimesheetListProps {
 
 export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, setOvertimeOption, monthlySummary }: TimesheetListProps) {
   const pdfGeneratorRef = useRef<{ handleExportPDF: () => void; handleShare: () => void }>(null);
+  const { language } = useContext(LanguageContext);
+  const t = translations[language];
+  const locale = language === 'hr' ? hr : de;
 
   const now = new Date();
-  const monthName = format(now, 'LLLL yyyy', { locale: hr });
+  const monthName = format(now, 'LLLL yyyy', { locale });
 
   const monthlyEntries = useMemo(() => {
     return entries.filter(entry => {
@@ -88,8 +93,8 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
            <div className="mx-auto bg-secondary rounded-full p-4 w-fit">
             <CalendarDays className="h-12 w-12 text-muted-foreground" />
            </div>
-          <CardTitle className="mt-4 text-2xl font-headline">Nema unosa</CardTitle>
-          <CardDescription>Dodajte svoj prvi unos koristeći obrazac iznad.</CardDescription>
+          <CardTitle className="mt-4 text-2xl font-headline">{t.noEntries}</CardTitle>
+          <CardDescription>{t.addFirstEntry}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -100,18 +105,18 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
     <Card className="w-full shadow-lg animate-in fade-in-50">
       <CardHeader className="flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-2xl font-headline">Zabilježeni unosi</CardTitle>
-          <CardDescription>Popis vaših nedavnih radnih sati.</CardDescription>
+          <CardTitle className="text-2xl font-headline">{t.loggedEntries}</CardTitle>
+          <CardDescription>{t.recentWorkHours}</CardDescription>
         </div>
         <div className="flex gap-2">
             <Button onClick={handleExportPDF} variant="outline" disabled={monthlyEntries.length === 0}>
                 <FileType2 className="mr-2 h-4 w-4" />
-                Izvezi PDF
+                {t.exportPdf}
             </Button>
             {navigator.share && (
                 <Button onClick={handleShare} variant="outline" disabled={monthlyEntries.length === 0}>
                     <Share2 className="mr-2 h-4 w-4" />
-                    Podijeli
+                    {t.share}
                 </Button>
             )}
         </div>
@@ -120,13 +125,13 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Datum</TableHead>
-              <TableHead>Početak</TableHead>
-              <TableHead>Kraj</TableHead>
-              <TableHead>Pauza</TableHead>
-              <TableHead>Lokacija</TableHead>
-              <TableHead className="text-right">Prekovremeni</TableHead>
-              <TableHead className="text-right w-[100px]">Akcije</TableHead>
+              <TableHead>{t.date}</TableHead>
+              <TableHead>{t.startTime}</TableHead>
+              <TableHead>{t.endTime}</TableHead>
+              <TableHead>{t.pause}</TableHead>
+              <TableHead>{t.location}</TableHead>
+              <TableHead className="text-right">{t.overtime}</TableHead>
+              <TableHead className="text-right w-[100px]">{t.actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -148,20 +153,20 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                     <AlertDialogTrigger asChild>
                       <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
                           <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Izbriši unos</span>
+                          <span className="sr-only">{t.deleteEntry}</span>
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Jeste li sigurni?</AlertDialogTitle>
+                        <AlertDialogTitle>{t.areYouSure}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Ova akcija se ne može poništiti. Trajno će izbrisati ovaj unos.
+                          {t.deleteEntryAction}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Odustani</AlertDialogCancel>
+                        <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
                         <AlertDialogAction onClick={() => deleteEntry(entry.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                          Izbriši
+                          {t.delete}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -174,32 +179,32 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
       </CardContent>
       <CardFooter className="flex-col items-center gap-4">
           <div className="w-full">
-            <h3 className="font-bold text-lg mb-2 text-center">Mjesečni sažetak ({monthName})</h3>
+            <h3 className="font-bold text-lg mb-2 text-center">{t.monthlySummary} ({monthName})</h3>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
                 <div className="bg-muted p-2 rounded-md">
-                    <p className="text-muted-foreground">Ukupno radnih sati</p>
+                    <p className="text-muted-foreground">{t.totalWorkHours}</p>
                     <p className="font-bold text-base">{monthlySummary.totalWorkHours.toFixed(2)}h</p>
                 </div>
                 <div className="bg-muted p-2 rounded-md">
-                    <p className="text-muted-foreground">Ukupno prekovremenih</p>
+                    <p className="text-muted-foreground">{t.totalOvertime}</p>
                     <p className={`font-bold text-base ${monthlySummary.totalOvertime >= 0 ? 'text-green-600' : 'text-red-600'}`}>{monthlySummary.totalOvertime.toFixed(2)}h</p>
                 </div>
                 <div className="bg-muted p-2 rounded-md">
-                    <p className="text-muted-foreground">Ukupno pauze</p>
+                    <p className="text-muted-foreground">{t.totalPause}</p>
                     <p className="font-bold text-base">{monthlySummary.totalPause} min</p>
                 </div>
                  <div className="bg-muted p-2 rounded-md">
-                    <p className="text-muted-foreground">Dani godišnjeg</p>
+                    <p className="text-muted-foreground">{t.vacationDays}</p>
                     <p className="font-bold text-base">{monthlySummary.vacationDays}</p>
                 </div>
                 <div className="bg-muted p-2 rounded-md">
-                    <p className="text-muted-foreground">Praznici</p>
+                    <p className="text-muted-foreground">{t.holidays}</p>
                     <p className="font-bold text-base">{monthlySummary.holidayDays}</p>
                 </div>
             </div>
           </div>
           <div className="flex flex-col items-center mt-4">
-            <Label className="font-bold">Opcija za prekovremene:</Label>
+            <Label className="font-bold">{t.overtimeOption}:</Label>
              <RadioGroup
                 value={overtimeOption}
                 onValueChange={(value: OvertimeOption) => setOvertimeOption(value)}
@@ -207,11 +212,11 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="payout" id="payout" />
-                <Label htmlFor="payout">Isplata</Label>
+                <Label htmlFor="payout">{t.payout}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="keep" id="keep" />
-                <Label htmlFor="keep">Ostaje</Label>
+                <Label htmlFor="keep">{t.keep}</Label>
               </div>
             </RadioGroup>
           </div>

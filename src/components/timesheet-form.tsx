@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -14,6 +14,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Plane, PartyPopper, User } from 'lucide-react';
+import { LanguageContext } from '@/contexts/LanguageContext';
+import { translations } from '@/lib/translations';
 
 const formSchema = z.object({
   userName: z.string().min(1, 'Ime i prezime je obavezno.'),
@@ -34,6 +36,8 @@ interface TimesheetFormProps {
 
 export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetFormProps) {
   const { toast } = useToast();
+  const { language } = useContext(LanguageContext);
+  const t = translations[language];
 
   const form = useForm<TimesheetFormValues>({
     resolver: zodResolver(formSchema),
@@ -56,8 +60,8 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
     setUserName(userName);
     addEntry(entryData);
     toast({
-        title: "Entry Added",
-        description: `Your work on ${format(data.date, 'PPP')} has been logged.`,
+        title: t.entryAdded,
+        description: `${t.workOn} ${format(data.date, 'PPP')} ${t.hasBeenLogged}.`,
     })
     form.reset({
         ...data,
@@ -72,7 +76,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
   const handleAddSpecialDay = (isVacation: boolean) => {
     const { date, userName } = form.getValues();
     if (!date) {
-        toast({ variant: 'destructive', title: 'Greška', description: 'Molimo odaberite datum.' });
+        toast({ variant: 'destructive', title: t.error, description: t.pleaseSelectDate });
         return;
     }
      setUserName(userName);
@@ -86,16 +90,16 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
         isHoliday: !isVacation
     });
     toast({
-        title: isVacation ? "Godišnji odmor dodan" : "Praznik dodan",
-        description: `Dan ${format(date, 'PPP')} je zabilježen kao ${isVacation ? 'godišnji odmor' : 'praznik'}.`,
+        title: isVacation ? t.vacationAdded : t.holidayAdded,
+        description: `${t.day} ${format(date, 'PPP')} ${t.hasBeenLoggedAs} ${isVacation ? t.vacation.toLowerCase() : t.holiday.toLowerCase()}.`,
     });
   }
 
   return (
     <Card className="w-full shadow-lg animate-in fade-in-50">
       <CardHeader>
-        <CardTitle className="text-2xl font-headline">New Time Entry</CardTitle>
-        <CardDescription>Fill in your work details for the day.</CardDescription>
+        <CardTitle className="text-2xl font-headline">{t.newTimeEntry}</CardTitle>
+        <CardDescription>{t.fillInWorkDetails}</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -105,11 +109,11 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="userName"
               render={({ field }) => (
                 <FormItem className="sm:col-span-2 lg:col-span-3">
-                  <FormLabel>Ime i prezime</FormLabel>
+                  <FormLabel>{t.nameAndSurname}</FormLabel>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
-                      <Input placeholder="npr. Ivan Horvat" className="pl-10" {...field} />
+                      <Input placeholder={t.namePlaceholder} className="pl-10" {...field} />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -121,7 +125,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date</FormLabel>
+                  <FormLabel>{t.date}</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -133,7 +137,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                          {field.value ? format(field.value, 'PPP') : <span>{t.pickADate}</span>}
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
@@ -150,7 +154,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="startTime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Start Time</FormLabel>
+                  <FormLabel>{t.startTime}</FormLabel>
                    <div className="relative">
                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -166,7 +170,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="endTime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>End Time</FormLabel>
+                  <FormLabel>{t.endTime}</FormLabel>
                   <div className="relative">
                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -182,7 +186,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="pause"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pause (minutes)</FormLabel>
+                  <FormLabel>{t.pause}</FormLabel>
                   <div className="relative">
                     <Coffee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -198,11 +202,11 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="location"
               render={({ field }) => (
                 <FormItem className="lg:col-span-2">
-                  <FormLabel>Location</FormLabel>
+                  <FormLabel>{t.location}</FormLabel>
                   <div className="relative flex-grow">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
-                      <Input placeholder="e.g., Main Office" className="pl-10" {...field} />
+                      <Input placeholder={t.locationPlaceholder} className="pl-10" {...field} />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -213,13 +217,13 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
           <CardFooter className="flex justify-end gap-2 flex-wrap">
              <Button type="button" variant="outline" onClick={() => handleAddSpecialDay(true)}>
                 <Plane className="mr-2 h-4 w-4"/>
-                Dodaj godišnji
+                {t.addVacation}
              </Button>
              <Button type="button" variant="outline" onClick={() => handleAddSpecialDay(false)}>
                 <PartyPopper className="mr-2 h-4 w-4"/>
-                Dodaj praznik
+                {t.addHoliday}
              </Button>
-             <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90">Save Entry</Button>
+             <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90">{t.saveEntry}</Button>
           </CardFooter>
         </form>
       </Form>

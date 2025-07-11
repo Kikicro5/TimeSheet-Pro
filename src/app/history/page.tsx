@@ -112,12 +112,10 @@ export default function HistoryPage() {
                               <FileType2 className="h-4 w-4" />
                               <span className="sr-only">Izvezi PDF</span>
                           </Button>
-                          {navigator.share && (
-                              <Button variant="ghost" size="icon" onClick={() => handleShare(entry.id)} className="text-muted-foreground hover:text-primary">
-                                  <Share2 className="h-4 w-4" />
-                                  <span className="sr-only">Podijeli</span>
-                              </Button>
-                          )}
+                          <Button variant="ghost" size="icon" onClick={() => handleShare(entry.id)} className="text-muted-foreground hover:text-primary">
+                              <Share2 className="h-4 w-4" />
+                              <span className="sr-only">Podijeli</span>
+                          </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">

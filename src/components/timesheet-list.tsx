@@ -269,12 +269,12 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
     </Card>
 
     {/* Hidden div for PDF export */}
-    <div ref={pdfRef} style={{ display: 'none' }} className="p-8 bg-white text-black text-base">
+    <div ref={pdfRef} style={{ display: 'none' }} className="p-8 bg-white text-black text-xs">
       <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-gray-800">
-        <h1 className="text-xl font-bold">{userName}</h1>
-        <h2 className="text-xl text-gray-700">{monthName}</h2>
+        <h1 className="text-lg font-bold">{userName}</h1>
+        <h2 className="text-lg text-gray-700">{monthName}</h2>
       </div>
-      <table className="w-full text-sm border-collapse border border-gray-400">
+      <table className="w-full text-xs border-collapse border border-gray-400">
         <thead>
           <tr className="bg-gray-200">
             <th className="border border-gray-300 p-2">Datum</th>

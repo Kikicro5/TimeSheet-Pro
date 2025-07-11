@@ -191,7 +191,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : `${entry.pause} min`}</TableCell>
                 <TableCell><div className="max-w-[200px] truncate">{entry.location}</div></TableCell>
                 <TableCell className={`text-right font-mono ${overtimeHours >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {entry.isVacation || entry.isHoliday ? '-' : `${overtimeHours.toFixed(2)}h`}
+                    {entry.isVacation || entry.isHoliday ? '-' : overtimeHours.toFixed(2) + 'h'}
                 </TableCell>
                 <TableCell className="text-right">
                   <AlertDialog>
@@ -269,20 +269,20 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
     </Card>
 
     {/* Hidden div for PDF export */}
-    <div ref={pdfRef} style={{ display: 'none' }} className="p-8 bg-white text-black text-xs">
-      <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-gray-800">
-        <h1 className="text-lg font-bold">{userName}</h1>
-        <h2 className="text-lg text-gray-700">{monthName}</h2>
+    <div ref={pdfRef} style={{ display: 'none', width: '210mm', minHeight: '297mm' }} className="p-4 bg-white text-black text-xs">
+      <div className="flex justify-between items-center mb-4 pb-1 border-b border-gray-800">
+        <h1 className="text-base font-bold">{userName}</h1>
+        <h2 className="text-base text-gray-700">{monthName}</h2>
       </div>
       <table className="w-full text-xs border-collapse border border-gray-400">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border border-gray-300 p-2">Datum</th>
-            <th className="border border-gray-300 p-2">Početak</th>
-            <th className="border border-gray-300 p-2">Kraj</th>
-            <th className="border border-gray-300 p-2">Pauza (min)</th>
-            <th className="border border-gray-300 p-2">Radni sati</th>
-            <th className="border border-gray-300 p-2">Prekovremeni</th>
+            <th className="border border-gray-300 p-1">Datum</th>
+            <th className="border border-gray-300 p-1">Početak</th>
+            <th className="border border-gray-300 p-1">Kraj</th>
+            <th className="border border-gray-300 p-1">Pauza (min)</th>
+            <th className="border border-gray-300 p-1">Radni sati</th>
+            <th className="border border-gray-300 p-1">Prekovremeni</th>
           </tr>
         </thead>
         <tbody>
@@ -290,16 +290,16 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
             if (entry.isVacation) {
                 return (
                     <tr key={entry.id} className="text-center bg-blue-100">
-                        <td className="border border-gray-300 p-2">{format(entry.date, 'dd.MM.yyyy')}</td>
-                        <td colSpan={5} className="border border-gray-300 p-2 font-semibold">Godišnji odmor</td>
+                        <td className="border border-gray-300 p-1">{format(entry.date, 'dd.MM.yyyy')}</td>
+                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold">Godišnji odmor</td>
                     </tr>
                 )
             }
             if (entry.isHoliday) {
                 return (
                     <tr key={entry.id} className="text-center bg-green-100">
-                        <td className="border border-gray-300 p-2">{format(entry.date, 'dd.MM.yyyy')}</td>
-                        <td colSpan={5} className="border border-gray-300 p-2 font-semibold">Praznik</td>
+                        <td className="border border-gray-300 p-1">{format(entry.date, 'dd.MM.yyyy')}</td>
+                        <td colSpan={5} className="border border-gray-300 p-1 font-semibold">Praznik</td>
                     </tr>
                 )
             }
@@ -307,19 +307,19 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
             const totalHours = typeof entry.totalHours === 'number' ? entry.totalHours : 0;
             return (
               <tr key={entry.id} className="text-center">
-                <td className="border border-gray-300 p-2">{format(entry.date, 'dd.MM.yyyy')}</td>
-                <td className="border border-gray-300 p-2">{entry.startTime}</td>
-                <td className="border border-gray-300 p-2">{entry.endTime}</td>
-                <td className="border border-gray-300 p-2">{entry.pause}</td>
-                <td className="border border-gray-300 p-2">{totalHours.toFixed(2)}h</td>
-                <td className="border border-gray-300 p-2">{overtimeHours.toFixed(2)}h</td>
+                <td className="border border-gray-300 p-1">{format(entry.date, 'dd.MM.yyyy')}</td>
+                <td className="border border-gray-300 p-1">{entry.startTime}</td>
+                <td className="border border-gray-300 p-1">{entry.endTime}</td>
+                <td className="border border-gray-300 p-1">{entry.pause}</td>
+                <td className="border border-gray-300 p-1">{totalHours.toFixed(2)}h</td>
+                <td className="border border-gray-300 p-1">{overtimeHours.toFixed(2)}h</td>
               </tr>
             )
           })}
         </tbody>
       </table>
-      <div className="mt-6 border-t pt-4">
-        <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+      <div className="mt-4 pt-2 border-t">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
           <div className="flex justify-between"><p>Ukupno radnih sati:</p> <p className="font-bold">{monthlySummary.totalWorkHours.toFixed(2)}h</p></div>
           <div className="flex justify-between"><p>Ukupno prekovremenih:</p> <p className="font-bold">{monthlySummary.totalOvertime.toFixed(2)}h</p></div>
           <div className="flex justify-between"><p>Ukupno pauze:</p> <p className="font-bold">{monthlySummary.totalPause} min</p></div>
@@ -327,7 +327,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
           <div className="flex justify-between"><p>Praznici:</p> <p className="font-bold">{monthlySummary.holidayDays}</p></div>
         </div>
       </div>
-       <div className="mt-4 pt-2 border-t">
+       <div className="mt-2 pt-1 border-t">
          <p><strong>Opcija za prekovremene:</strong> {overtimeOption === 'payout' ? 'Isplata' : 'Ostaje'}</p>
        </div>
     </div>

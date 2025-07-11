@@ -23,7 +23,7 @@ export const translations = {
     startTime: 'Startzeit',
     endTime: 'Endzeit',
     pause: 'Pause',
-    location: 'Standort',
+    location: 'Einsatzort',
     locationPlaceholder: 'z.B. Hauptbüro',
     addVacation: 'Urlaub hinzufügen',
     addHoliday: 'Feiertag hinzufügen',

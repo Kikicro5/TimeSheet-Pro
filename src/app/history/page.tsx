@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { DownloadHistoryEntry } from '@/types';
 import { format } from 'date-fns';
@@ -8,7 +8,7 @@ import { hr } from 'date-fns/locale';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, DownloadCloud, Trash2 } from 'lucide-react';
+import { ArrowLeft, DownloadCloud, Trash2, FileType2, Share2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,10 +20,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { PdfGenerator } from '@/components/pdf-generator';
+
+interface HistoryPdfGeneratorHandles {
+    handleExportPDF: () => void;
+    handleShare: () => void;
+}
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<DownloadHistoryEntry[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const pdfGeneratorRef = useRef<Record<string, HistoryPdfGeneratorHandles>>({});
 
   useEffect(() => {
     setIsClient(true);
@@ -32,6 +39,8 @@ export default function HistoryPage() {
       const parsedHistory = JSON.parse(savedHistory).map((h: any) => ({
         ...h,
         downloadDate: new Date(h.downloadDate),
+        // Ensure nested date objects are correctly parsed
+        entries: h.entries.map((e: any) => ({ ...e, date: new Date(e.date) }))
       }));
       setHistory(parsedHistory.sort((a: any, b: any) => b.downloadDate.getTime() - a.downloadDate.getTime()));
     }
@@ -48,11 +57,20 @@ export default function HistoryPage() {
     localStorage.removeItem('download-history');
   }
 
+  const handleExport = (id: string) => {
+    pdfGeneratorRef.current[id]?.handleExportPDF();
+  };
+
+  const handleShare = (id: string) => {
+    pdfGeneratorRef.current[id]?.handleShare();
+  };
+
   if (!isClient) {
     return null; // or a loading skeleton
   }
 
   return (
+    <>
     <div className="min-h-screen bg-background text-foreground">
        <header className="bg-primary text-primary-foreground shadow-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -90,6 +108,16 @@ export default function HistoryPage() {
                       <TableCell>{entry.userName}</TableCell>
                       <TableCell>{format(entry.downloadDate, "dd.MM.yyyy 'u' HH:mm", { locale: hr })}</TableCell>
                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" onClick={() => handleExport(entry.id)} className="text-muted-foreground hover:text-primary">
+                              <FileType2 className="h-4 w-4" />
+                              <span className="sr-only">Izvezi PDF</span>
+                          </Button>
+                          {navigator.share && (
+                              <Button variant="ghost" size="icon" onClick={() => handleShare(entry.id)} className="text-muted-foreground hover:text-primary">
+                                  <Share2 className="h-4 w-4" />
+                                  <span className="sr-only">Podijeli</span>
+                              </Button>
+                          )}
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
@@ -155,5 +183,22 @@ export default function HistoryPage() {
         </Card>
       </main>
     </div>
+    {/* Render a hidden PDF generator for each history entry */}
+    {history.map(entry => (
+        <PdfGenerator
+          key={entry.id}
+          ref={el => {
+              if (el) {
+                  pdfGeneratorRef.current[entry.id] = el;
+              }
+          }}
+          userName={entry.userName}
+          monthName={entry.monthName}
+          monthlyEntries={entry.entries}
+          monthlySummary={entry.monthlySummary}
+          overtimeOption={entry.overtimeOption}
+        />
+    ))}
+    </>
   );
 }

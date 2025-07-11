@@ -13,9 +13,20 @@ export interface TimeEntry {
 
 export type OvertimeOption = 'payout' | 'keep';
 
+// This will now store all necessary data to regenerate the PDF.
 export interface DownloadHistoryEntry {
   id: string;
   userName: string;
   monthName: string;
   downloadDate: Date;
+  // Added fields to store the state at the time of download
+  entries: TimeEntry[];
+  monthlySummary: {
+    totalWorkHours: number;
+    totalOvertime: number;
+    totalPause: number;
+    vacationDays: number;
+    holidayDays: number;
+  };
+  overtimeOption: OvertimeOption;
 }

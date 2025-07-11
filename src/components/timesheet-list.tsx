@@ -35,6 +35,7 @@ interface TimesheetListProps {
     totalOvertime: number;
     totalPause: number;
     vacationDays: number;
+    holidayDays: number;
   };
 }
 
@@ -167,15 +168,16 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
           <TableBody>
             {entries.map(entry => {
               const overtimeHours = typeof entry.overtimeHours === 'number' ? entry.overtimeHours : 0;
+              const rowClass = entry.isVacation ? 'bg-blue-50 hover:bg-blue-100' : entry.isHoliday ? 'bg-green-50 hover:bg-green-100' : '';
               return (
-              <TableRow key={entry.id} className={`animate-in fade-in-25 ${entry.isVacation ? 'bg-blue-50 hover:bg-blue-100' : ''}`}>
+              <TableRow key={entry.id} className={`animate-in fade-in-25 ${rowClass}`}>
                 <TableCell className="font-medium">{format(entry.date, 'dd.MM.yyyy')}</TableCell>
-                <TableCell>{entry.isVacation ? '-' : entry.startTime}</TableCell>
-                <TableCell>{entry.isVacation ? '-' : entry.endTime}</TableCell>
-                <TableCell>{entry.isVacation ? '-' : `${entry.pause} min`}</TableCell>
+                <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.startTime}</TableCell>
+                <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.endTime}</TableCell>
+                <TableCell>{entry.isVacation || entry.isHoliday ? '-' : `${entry.pause} min`}</TableCell>
                 <TableCell><div className="max-w-[200px] truncate">{entry.location}</div></TableCell>
                 <TableCell className={`text-right font-mono ${overtimeHours >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {entry.isVacation ? '-' : `${overtimeHours.toFixed(2)}h`}
+                    {entry.isVacation || entry.isHoliday ? '-' : `${overtimeHours.toFixed(2)}h`}
                 </TableCell>
                 <TableCell className="text-right">
                   <AlertDialog>
@@ -209,7 +211,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
       <CardFooter className="flex-col items-start gap-4">
           <div className="w-full">
             <h3 className="font-bold text-lg mb-2">Mjesečni sažetak ({monthName})</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
                 <div className="bg-muted p-2 rounded-md">
                     <p className="text-muted-foreground">Ukupno radnih sati</p>
                     <p className="font-bold text-base">{monthlySummary.totalWorkHours.toFixed(2)}h</p>
@@ -225,6 +227,10 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                  <div className="bg-muted p-2 rounded-md">
                     <p className="text-muted-foreground">Dani godišnjeg</p>
                     <p className="font-bold text-base">{monthlySummary.vacationDays}</p>
+                </div>
+                <div className="bg-muted p-2 rounded-md">
+                    <p className="text-muted-foreground">Praznici</p>
+                    <p className="font-bold text-base">{monthlySummary.holidayDays}</p>
                 </div>
             </div>
           </div>
@@ -276,6 +282,14 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                     </tr>
                 )
             }
+            if (entry.isHoliday) {
+                return (
+                    <tr key={entry.id} className="text-center bg-green-100">
+                        <td className="border border-gray-300 p-2">{format(entry.date, 'dd.MM.yyyy')}</td>
+                        <td colSpan={5} className="border border-gray-300 p-2 font-semibold">Praznik</td>
+                    </tr>
+                )
+            }
             const overtimeHours = typeof entry.overtimeHours === 'number' ? entry.overtimeHours : 0;
             const totalHours = typeof entry.totalHours === 'number' ? entry.totalHours : 0;
             return (
@@ -298,6 +312,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
           <p><strong>Ukupno prekovremenih:</strong> {monthlySummary.totalOvertime.toFixed(2)}h</p>
           <p><strong>Ukupno pauze:</strong> {monthlySummary.totalPause} min</p>
           <p><strong>Dani godišnjeg:</strong> {monthlySummary.vacationDays}</p>
+          <p><strong>Praznici:</strong> {monthlySummary.holidayDays}</p>
         </div>
       </div>
        <div className="mt-4">

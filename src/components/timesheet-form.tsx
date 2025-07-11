@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Sparkles, Loader2, Plane } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Sparkles, Loader2, Plane, PartyPopper } from 'lucide-react';
 import { getAISuggestion } from '@/app/actions';
 
 const formSchema = z.object({
@@ -27,7 +27,7 @@ const formSchema = z.object({
 type TimesheetFormValues = z.infer<typeof formSchema>;
 
 interface TimesheetFormProps {
-  addEntry: (data: TimesheetFormValues & { isVacation?: boolean }) => void;
+  addEntry: (data: TimesheetFormValues & { isVacation?: boolean; isHoliday?: boolean }) => void;
 }
 
 export function TimesheetForm({ addEntry }: TimesheetFormProps) {
@@ -95,6 +95,22 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
     toast({
         title: "Godišnji odmor dodan",
         description: `Dan ${format(vacationDate, 'PPP')} je zabilježen kao godišnji odmor.`,
+    });
+  }
+
+  const handleAddHoliday = () => {
+    const holidayDate = form.getValues('date');
+    addEntry({
+        date: holidayDate,
+        startTime: '',
+        endTime: '',
+        pause: 0,
+        location: '',
+        isHoliday: true,
+    });
+    toast({
+        title: "Praznik dodan",
+        description: `Dan ${format(holidayDate, 'PPP')} je zabilježen kao praznik.`,
     });
   }
 
@@ -206,10 +222,14 @@ export function TimesheetForm({ addEntry }: TimesheetFormProps) {
               )}
             />
           </CardContent>
-          <CardFooter className="flex justify-end gap-2">
+          <CardFooter className="flex justify-end gap-2 flex-wrap">
              <Button type="button" variant="outline" onClick={handleAddVacation}>
                 <Plane className="mr-2 h-4 w-4"/>
                 Dodaj godišnji
+             </Button>
+             <Button type="button" variant="outline" onClick={handleAddHoliday}>
+                <PartyPopper className="mr-2 h-4 w-4"/>
+                Dodaj praznik
              </Button>
              <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90">Save Entry</Button>
           </CardFooter>

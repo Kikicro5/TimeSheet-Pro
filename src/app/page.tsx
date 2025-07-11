@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useContext } from 'react';
@@ -134,12 +135,10 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
              {isClient && (
-                <div className="flex items-center gap-2 text-sm sm:text-lg">
+                <div className="flex items-center gap-2 text-sm">
                   <PiggyBank className="h-6 w-6" />
-                  <span className="hidden sm:inline">
-                    {t.overtime}: {monthlySummary.totalOvertime.toFixed(2)}h
-                  </span>
-                   <span className="sm:hidden">
+                  <span>
+                    <span className="hidden sm:inline">{t.overtime}: </span>
                     {monthlySummary.totalOvertime.toFixed(2)}h
                   </span>
                 </div>

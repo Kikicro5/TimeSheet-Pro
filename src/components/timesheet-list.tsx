@@ -164,15 +164,17 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {entries.map(entry => (
+            {entries.map(entry => {
+              const overtimeHours = typeof entry.overtimeHours === 'number' ? entry.overtimeHours : 0;
+              return (
               <TableRow key={entry.id} className="animate-in fade-in-25">
                 <TableCell className="font-medium">{format(entry.date, 'dd.MM.yyyy')}</TableCell>
                 <TableCell>{entry.startTime}</TableCell>
                 <TableCell>{entry.endTime}</TableCell>
                 <TableCell>{entry.pause} min</TableCell>
                 <TableCell><div className="max-w-[200px] truncate">{entry.location}</div></TableCell>
-                <TableCell className={`text-right font-mono ${entry.overtimeHours >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {entry.overtimeHours.toFixed(2)}h
+                <TableCell className={`text-right font-mono ${overtimeHours >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {overtimeHours.toFixed(2)}h
                 </TableCell>
                 <TableCell className="text-right">
                   <AlertDialog>
@@ -199,7 +201,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                   </AlertDialog>
                 </TableCell>
               </TableRow>
-            ))}
+            )})}
           </TableBody>
         </Table>
       </CardContent>
@@ -264,16 +266,20 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
           </tr>
         </thead>
         <tbody>
-          {monthlyEntries.map(entry => (
-            <tr key={entry.id} className="text-center">
-              <td className="border border-gray-300 p-2">{format(entry.date, 'dd.MM.yyyy')}</td>
-              <td className="border border-gray-300 p-2">{entry.startTime}</td>
-              <td className="border border-gray-300 p-2">{entry.endTime}</td>
-              <td className="border border-gray-300 p-2">{entry.pause}</td>
-              <td className="border border-gray-300 p-2">{entry.totalHours.toFixed(2)}h</td>
-              <td className="border border-gray-300 p-2">{entry.overtimeHours.toFixed(2)}h</td>
-            </tr>
-          ))}
+          {monthlyEntries.map(entry => {
+            const overtimeHours = typeof entry.overtimeHours === 'number' ? entry.overtimeHours : 0;
+            const totalHours = typeof entry.totalHours === 'number' ? entry.totalHours : 0;
+            return (
+              <tr key={entry.id} className="text-center">
+                <td className="border border-gray-300 p-2">{format(entry.date, 'dd.MM.yyyy')}</td>
+                <td className="border border-gray-300 p-2">{entry.startTime}</td>
+                <td className="border border-gray-300 p-2">{entry.endTime}</td>
+                <td className="border border-gray-300 p-2">{entry.pause}</td>
+                <td className="border border-gray-300 p-2">{totalHours.toFixed(2)}h</td>
+                <td className="border border-gray-300 p-2">{overtimeHours.toFixed(2)}h</td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
       <div className="mt-6 border-t pt-4">

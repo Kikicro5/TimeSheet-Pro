@@ -3,7 +3,7 @@
 import { useMemo, useRef } from 'react';
 import { format } from 'date-fns';
 import { hr } from 'date-fns/locale';
-import { TimeEntry, OvertimeOption } from '@/types';
+import { TimeEntry, OvertimeOption, DownloadHistoryEntry } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -51,6 +51,18 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
       return entryDate.getMonth() === now.getMonth() && entryDate.getFullYear() === now.getFullYear();
     });
   }, [entries, now]);
+  
+  const addDownloadToHistory = () => {
+    const newHistoryEntry: DownloadHistoryEntry = {
+        id: new Date().toISOString(),
+        userName: userName,
+        monthName: monthName,
+        downloadDate: new Date(),
+    };
+    const history = JSON.parse(localStorage.getItem('download-history') || '[]');
+    history.push(newHistoryEntry);
+    localStorage.setItem('download-history', JSON.stringify(history));
+  }
 
   const handleExportPDF = async () => {
     const input = pdfRef.current;
@@ -80,6 +92,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
 
     pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
     pdf.save(`lista_sati_${userName.replace(' ','_')}_${monthName}.pdf`);
+    addDownloadToHistory();
   };
 
   const handleShare = async () => {
@@ -107,6 +120,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                 text: `Mjesečna lista sati za ${userName} za ${monthName}.`,
                 files: [file],
             });
+             addDownloadToHistory();
         }, 'image/png');
     } catch (error) {
         console.error('Greška pri dijeljenju:', error);

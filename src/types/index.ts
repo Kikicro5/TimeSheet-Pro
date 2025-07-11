@@ -12,3 +12,10 @@ export interface TimeEntry {
 }
 
 export type OvertimeOption = 'payout' | 'keep';
+
+export interface DownloadHistoryEntry {
+  id: string;
+  userName: string;
+  monthName: string;
+  downloadDate: Date;
+}

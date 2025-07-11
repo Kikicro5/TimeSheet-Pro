@@ -4,9 +4,11 @@ import { useState, useMemo, useEffect } from 'react';
 import type { TimeEntry, OvertimeOption } from '@/types';
 import { TimesheetForm } from '@/components/timesheet-form';
 import { TimesheetList } from '@/components/timesheet-list';
-import { PiggyBank } from 'lucide-react';
+import { PiggyBank, History } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
@@ -122,14 +124,22 @@ export default function Home() {
       <header className="bg-primary text-primary-foreground shadow-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold font-headline">TimeSheet Pro</h1>
-          {isClient && (
-            <div className="flex items-center gap-2 text-lg">
-              <PiggyBank className="h-6 w-6" />
-              <span>
-                Prekovremeni: {monthlySummary.totalOvertime.toFixed(2)}h
-              </span>
-            </div>
-          )}
+          <div className="flex items-center gap-4">
+             {isClient && (
+                <div className="flex items-center gap-2 text-lg">
+                  <PiggyBank className="h-6 w-6" />
+                  <span>
+                    Prekovremeni: {monthlySummary.totalOvertime.toFixed(2)}h
+                  </span>
+                </div>
+             )}
+             <Button asChild variant="outline" size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                <Link href="/history">
+                    <History className="mr-2 h-4 w-4" />
+                    Povijest
+                </Link>
+             </Button>
+          </div>
         </div>
       </header>
       <main className="container mx-auto p-4 sm:p-6 lg:p-8 grid gap-8">

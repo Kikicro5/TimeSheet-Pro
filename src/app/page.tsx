@@ -134,15 +134,6 @@ export default function Home() {
             <h1 className="text-xl sm:text-2xl font-bold font-headline whitespace-nowrap">TimeSheet Pro</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-             {isClient && (
-                <div className="flex items-center gap-2 text-sm">
-                  <PiggyBank className="h-6 w-6" />
-                  <span>
-                    <span className="hidden sm:inline">{t.overtime}: </span>
-                    {monthlySummary.totalOvertime.toFixed(2)}h
-                  </span>
-                </div>
-             )}
              <Button asChild variant="outline" className="h-9 px-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                 <Link href="/history" className="flex items-center">
                     <History className="h-4 w-4" />

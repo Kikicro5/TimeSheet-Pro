@@ -13,7 +13,6 @@ import Link from 'next/link';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
 import { LanguageSwitcher } from '@/components/language-switcher';
-import { AdBanner } from '@/components/ad-banner';
 import {
   Dialog,
   DialogContent,
@@ -223,7 +222,6 @@ export default function Home() {
           setOvertimeOption={setOvertimeOption}
           monthlySummary={monthlySummary}
         />
-        <AdBanner />
       </main>
     </div>
   );

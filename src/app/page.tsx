@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AdBanner } from '@/components/ad-banner';
 
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
@@ -270,6 +271,7 @@ export default function Home() {
           monthlySummary={monthlySummary}
         />
       </main>
+      <AdBanner />
     </div>
   );
 }

@@ -40,6 +40,12 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0825549313210028"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <Script id="service-worker-installer">
           {`
             if ('serviceWorker' in navigator) {

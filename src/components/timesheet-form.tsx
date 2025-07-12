@@ -43,7 +43,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
   const form = useForm<TimesheetFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userName: userName,
+      userName: userName || '',
       date: new Date(),
       startTime: '07:00',
       endTime: '16:00',

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Adsense from 'react-adsense';
 
 const AdBanner = () => {
   const [isClient, setIsClient] = useState(false);
@@ -10,6 +9,16 @@ const AdBanner = () => {
     setIsClient(true);
   }, []);
 
+  useEffect(() => {
+    if (isClient) {
+      try {
+        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+      } catch (err) {
+        console.error("AdSense error:", err);
+      }
+    }
+  }, [isClient]);
+
   if (!isClient) {
     return null;
   }
@@ -17,13 +26,14 @@ const AdBanner = () => {
   return (
     <div className="fixed bottom-0 left-0 w-full flex justify-center items-center bg-background/80 backdrop-blur-sm p-2 z-50">
       <div className="w-full max-w-screen-lg">
-        <Adsense.Ad
-          client="ca-pub-0825549313210028"
-          slot="4207227293"
+        <ins
+          className="adsbygoogle"
           style={{ display: 'block' }}
-          layout="in-article"
-          format="fluid"
-        />
+          data-ad-client="ca-pub-0825549313210028"
+          data-ad-slot="4207227293"
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        ></ins>
       </div>
     </div>
   );

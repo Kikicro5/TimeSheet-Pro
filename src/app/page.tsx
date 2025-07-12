@@ -131,11 +131,7 @@ export default function Home() {
         return entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear;
     });
 
-    const job1Entries = monthlyEntries.filter(entry =>
-        entry.job === 'job1' || entry.isVacation || entry.isHoliday
-    );
-
-    return job1Entries.reduce(
+    return monthlyEntries.reduce(
         (acc, entry) => {
             if (entry.isVacation) {
                 acc.vacationDays += 1;
@@ -166,7 +162,7 @@ export default function Home() {
       (acc, entry) => {
         if (entry.isVacation) {
           acc.vacationDays += 1;
-        } else if (!entry.isHoliday && entry.job === 'job1') { // Only count overtime for job1
+        } else if (!entry.isHoliday) {
           acc.totalOvertime += (entry.overtimeHours || 0);
         }
         return acc;

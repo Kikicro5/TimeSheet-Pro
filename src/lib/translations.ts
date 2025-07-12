@@ -117,7 +117,7 @@ export const translations = {
     pickADate: 'Pick a date',
     startTime: 'Start Time',
     endTime: 'End Time',
-    pause: 'Pause (minutes)',
+    pause: 'Pause',
     location: 'Location',
     locationPlaceholder: 'e.g. Main Office',
     addVacation: 'Add Vacation',

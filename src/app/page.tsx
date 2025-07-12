@@ -238,7 +238,7 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8 grid gap-8 pb-24">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8 grid gap-8 pb-32">
         <TimesheetForm 
           addEntry={addEntry} 
           userName={userName}

@@ -21,23 +21,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [userName, setUserName] = useState('John Doe'); // Example user name
   const [overtimeOption, setOvertimeOption] = useState<OvertimeOption>('keep');
+  const [carryOverVacationDays, setCarryOverVacationDays] = useState(0);
+  const [carryOverOvertimeHours, setCarryOverOvertimeHours] = useState(0);
+
   const { toast } = useToast();
   const { language } = useContext(LanguageContext);
   const t = translations[language];
@@ -57,6 +51,14 @@ export default function Home() {
     if (savedUserName) {
       setUserName(savedUserName);
     }
+    const savedCarryOverVacation = localStorage.getItem('carry-over-vacation');
+    if (savedCarryOverVacation) {
+        setCarryOverVacationDays(parseFloat(savedCarryOverVacation) || 0);
+    }
+    const savedCarryOverOvertime = localStorage.getItem('carry-over-overtime');
+    if (savedCarryOverOvertime) {
+        setCarryOverOvertimeHours(parseFloat(savedCarryOverOvertime) || 0);
+    }
   }, []);
 
   useEffect(() => {
@@ -64,8 +66,10 @@ export default function Home() {
       localStorage.setItem('timesheet-entries', JSON.stringify(entries));
       localStorage.setItem('overtime-option', overtimeOption);
       localStorage.setItem('user-name', userName);
+      localStorage.setItem('carry-over-vacation', String(carryOverVacationDays));
+      localStorage.setItem('carry-over-overtime', String(carryOverOvertimeHours));
     }
-  }, [entries, overtimeOption, userName, isClient]);
+  }, [entries, overtimeOption, userName, carryOverVacationDays, carryOverOvertimeHours, isClient]);
   
   const addEntry = (entry: Omit<TimeEntry, 'id' | 'totalHours' | 'overtimeHours'>) => {
     const dateExists = entries.some(e => new Date(e.date).toDateString() === new Date(entry.date).toDateString());
@@ -158,7 +162,7 @@ export default function Home() {
       return entryDate.getFullYear() === currentYear;
     });
 
-    return yearlyEntries.reduce(
+    const summary = yearlyEntries.reduce(
       (acc, entry) => {
         if (entry.isVacation) {
           acc.vacationDays += 1;
@@ -169,7 +173,12 @@ export default function Home() {
       },
       { totalOvertime: 0, vacationDays: 0 }
     );
-  }, [entries, isClient]);
+    
+    return {
+        totalOvertime: summary.totalOvertime + carryOverOvertimeHours,
+        vacationDays: summary.vacationDays + carryOverVacationDays,
+    }
+  }, [entries, isClient, carryOverOvertimeHours, carryOverVacationDays]);
 
 
   return (
@@ -196,15 +205,35 @@ export default function Home() {
                    </DialogDescription>
                  </DialogHeader>
                  <div className="grid gap-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="carryOverVacation">{t.vacationFromPreviousYear}</Label>
+                      <Input 
+                        id="carryOverVacation"
+                        type="number" 
+                        value={carryOverVacationDays} 
+                        onChange={(e) => setCarryOverVacationDays(parseFloat(e.target.value) || 0)}
+                        className="text-right"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="carryOverOvertime">{t.overtimeFromPreviousYear}</Label>
+                      <Input
+                        id="carryOverOvertime"
+                        type="number"
+                        value={carryOverOvertimeHours}
+                        onChange={(e) => setCarryOverOvertimeHours(parseFloat(e.target.value) || 0)}
+                        className="text-right"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between pt-4 border-t mt-2">
+                        <span className="text-muted-foreground">{t.vacationDays} ({t.total})</span>
+                        <span className="font-bold text-lg">{yearlySummary.vacationDays}</span>
+                    </div>
                     <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">{t.totalOvertime}</span>
+                        <span className="text-muted-foreground">{t.totalOvertime} ({t.total})</span>
                         <span className={`font-bold text-lg ${yearlySummary.totalOvertime >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {yearlySummary.totalOvertime.toFixed(2)}h
                         </span>
-                    </div>
-                     <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">{t.vacationDays}</span>
-                        <span className="font-bold text-lg">{yearlySummary.vacationDays}</span>
                     </div>
                  </div>
                </DialogContent>

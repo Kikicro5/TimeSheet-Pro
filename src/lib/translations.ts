@@ -9,6 +9,7 @@ export const translations = {
     cancel: 'Abbrechen',
     areYouSure: 'Sind Sie sicher?',
     error: 'Fehler',
+    total: 'Gesamt',
     
     // Home Page
     overtime: 'Überstunden',
@@ -89,6 +90,8 @@ export const translations = {
     // Yearly Summary
     yearlySummary: 'Jahresübersicht',
     yearlySummaryDesc: 'Hier ist eine Zusammenfassung Ihrer Überstunden und Urlaubstage für das laufende Jahr.',
+    vacationFromPreviousYear: 'Urlaub aus dem Vorjahr',
+    overtimeFromPreviousYear: 'Überstunden aus dem Vorjahr',
   },
   en: {
     // General
@@ -100,6 +103,7 @@ export const translations = {
     cancel: 'Cancel',
     areYouSure: 'Are you sure?',
     error: 'Error',
+    total: 'Total',
     
     // Home Page
     overtime: 'Overtime',
@@ -151,6 +155,7 @@ export const translations = {
     holidays: 'Holidays',
     overtimeOption: 'Overtime Option',
     payout: 'Payout',
+
     keep: 'Keep',
     noEntries: 'No Entries',
     addFirstEntry: 'Add your first entry using the form above.',
@@ -180,5 +185,7 @@ export const translations = {
     // Yearly Summary
     yearlySummary: 'Yearly Summary',
     yearlySummaryDesc: 'Here is a summary of your overtime and vacation days for the current year.',
+    vacationFromPreviousYear: 'Vacation from previous year',
+    overtimeFromPreviousYear: 'Overtime from previous year',
   },
 };

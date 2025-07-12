@@ -238,12 +238,6 @@ export default function Home() {
                  </div>
                </DialogContent>
              </Dialog>
-             <Button asChild variant="outline" className="h-9 px-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                <Link href="/history" className="flex items-center">
-                    <History className="h-4 w-4" />
-                    <span className="ml-2">{t.history}</span>
-                </Link>
-             </Button>
              <LanguageSwitcher />
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useContext } from 'react';
@@ -13,9 +14,10 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Plane, PartyPopper, User } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Plane, PartyPopper, User, History } from 'lucide-react';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
+import Link from 'next/link';
 
 const formSchema = z.object({
   userName: z.string().min(1, 'Ime i prezime je obavezno.'),
@@ -107,6 +109,12 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
           <CardTitle className="text-2xl font-headline">{t.newTimeEntry}</CardTitle>
           <CardDescription>{t.fillInWorkDetails}</CardDescription>
         </div>
+        <Button asChild variant="outline">
+          <Link href="/history">
+            <History className="mr-2 h-4 w-4" />
+            {t.history}
+          </Link>
+        </Button>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>

@@ -178,7 +178,7 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="bg-primary text-primary-foreground shadow-md">
         <div className="w-full px-4 sm:container sm:mx-auto sm:px-6 lg:px-8 py-4 flex justify-between items-center gap-2">
           <div className="flex items-center gap-2">
@@ -238,7 +238,7 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8 grid gap-8 pb-32">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8 grid gap-8 flex-grow">
         <TimesheetForm 
           addEntry={addEntry} 
           userName={userName}

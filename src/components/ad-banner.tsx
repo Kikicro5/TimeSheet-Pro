@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -24,7 +25,7 @@ const AdBanner = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 w-full flex justify-center items-center bg-background p-2 z-50 border-t">
+    <div className="w-full flex justify-center items-center bg-background p-2 mt-auto border-t">
       <div className="w-full max-w-screen-lg">
         <ins
           className="adsbygoogle"

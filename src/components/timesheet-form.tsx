@@ -67,6 +67,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
     })
     form.reset({
         ...data,
+        userName: data.userName, // Keep the username after submission
         date: new Date(),
         startTime: '07:00',
         endTime: '16:00',
@@ -119,7 +120,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
-                      <Input placeholder={t.namePlaceholder} className="pl-10" {...field} />
+                      <Input placeholder="" className="pl-10" {...field} />
                     </FormControl>
                   </div>
                   <FormMessage />

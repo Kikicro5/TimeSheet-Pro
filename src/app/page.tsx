@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect, useContext } from 'react';
 import type { TimeEntry, OvertimeOption } from '@/types';
 import { TimesheetForm } from '@/components/timesheet-form';
 import { TimesheetList } from '@/components/timesheet-list';
-import { PiggyBank, History, Briefcase, RotateCw } from 'lucide-react';
+import { PiggyBank, History, Briefcase } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ import { Label } from '@/components/ui/label';
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [isClient, setIsClient] = useState(false);
-  const [userName, setUserName] = useState('John Doe'); // Example user name
+  const [userName, setUserName] = useState(''); // Example user name
   const [overtimeOption, setOvertimeOption] = useState<OvertimeOption>('keep');
   const [carryOverVacationDays, setCarryOverVacationDays] = useState(0);
   const [carryOverOvertimeHours, setCarryOverOvertimeHours] = useState(0);

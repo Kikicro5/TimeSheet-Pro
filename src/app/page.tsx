@@ -5,11 +5,10 @@ import { useState, useMemo, useEffect, useContext } from 'react';
 import type { TimeEntry, OvertimeOption } from '@/types';
 import { TimesheetForm } from '@/components/timesheet-form';
 import { TimesheetList } from '@/components/timesheet-list';
-import { PiggyBank, History, Briefcase } from 'lucide-react';
+import { PiggyBank, Briefcase } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
 import { LanguageSwitcher } from '@/components/language-switcher';
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import AdBanner from '@/components/ad-banner';
 
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
@@ -242,7 +242,7 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8 grid gap-8">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8 grid gap-8 pb-24">
         <TimesheetForm 
           addEntry={addEntry} 
           userName={userName}
@@ -257,6 +257,7 @@ export default function Home() {
           monthlySummary={monthlySummary}
         />
       </main>
+      <AdBanner />
     </div>
   );
 }

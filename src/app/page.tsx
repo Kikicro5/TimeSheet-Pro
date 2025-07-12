@@ -38,36 +38,54 @@ export default function Home() {
 
   useEffect(() => {
     setIsClient(true);
-    const savedEntries = localStorage.getItem('timesheet-entries');
-    if (savedEntries) {
-      const parsedEntries = JSON.parse(savedEntries).map((e: any) => ({...e, date: new Date(e.date)}));
-      setEntries(parsedEntries);
-    }
-    const savedOvertimeOption = localStorage.getItem('overtime-option') as OvertimeOption;
-    if (savedOvertimeOption) {
-      setOvertimeOption(savedOvertimeOption);
-    }
-    const savedUserName = localStorage.getItem('user-name');
-    if (savedUserName && savedUserName !== 'John Doe') {
-      setUserName(savedUserName);
-    }
-    const savedCarryOverVacation = localStorage.getItem('carry-over-vacation');
-    if (savedCarryOverVacation) {
-        setCarryOverVacationDays(parseFloat(savedCarryOverVacation) || 0);
-    }
-    const savedCarryOverOvertime = localStorage.getItem('carry-over-overtime');
-    if (savedCarryOverOvertime) {
-        setCarryOverOvertimeHours(parseFloat(savedCarryOverOvertime) || 0);
+    try {
+      const savedEntries = localStorage.getItem('timesheet-entries');
+      if (savedEntries) {
+        const parsedEntries = JSON.parse(savedEntries).map((e: any) => ({...e, date: new Date(e.date)}));
+        setEntries(parsedEntries);
+      }
+      const savedOvertimeOption = localStorage.getItem('overtime-option') as OvertimeOption;
+      if (savedOvertimeOption) {
+        setOvertimeOption(savedOvertimeOption);
+      }
+      const savedUserName = localStorage.getItem('user-name');
+      if (savedUserName && savedUserName !== 'John Doe') {
+        setUserName(savedUserName);
+      }
+      const savedCarryOverVacation = localStorage.getItem('carry-over-vacation');
+      if (savedCarryOverVacation) {
+          setCarryOverVacationDays(parseFloat(savedCarryOverVacation) || 0);
+      }
+      const savedCarryOverOvertime = localStorage.getItem('carry-over-overtime');
+      if (savedCarryOverOvertime) {
+          setCarryOverOvertimeHours(parseFloat(savedCarryOverOvertime) || 0);
+      }
+    } catch (error) {
+      console.error("Failed to load data from localStorage", error);
+      toast({
+        variant: 'destructive',
+        title: t.error,
+        description: 'Could not load saved data.',
+      })
     }
   }, []);
 
   useEffect(() => {
     if(isClient) {
-      localStorage.setItem('timesheet-entries', JSON.stringify(entries));
-      localStorage.setItem('overtime-option', overtimeOption);
-      localStorage.setItem('user-name', userName);
-      localStorage.setItem('carry-over-vacation', String(carryOverVacationDays));
-      localStorage.setItem('carry-over-overtime', String(carryOverOvertimeHours));
+      try {
+        localStorage.setItem('timesheet-entries', JSON.stringify(entries));
+        localStorage.setItem('overtime-option', overtimeOption);
+        localStorage.setItem('user-name', userName);
+        localStorage.setItem('carry-over-vacation', String(carryOverVacationDays));
+        localStorage.setItem('carry-over-overtime', String(carryOverOvertimeHours));
+      } catch (error) {
+        console.error("Failed to save data to localStorage", error);
+         toast({
+          variant: 'destructive',
+          title: t.error,
+          description: 'Could not save data.',
+        })
+      }
     }
   }, [entries, overtimeOption, userName, carryOverVacationDays, carryOverOvertimeHours, isClient]);
   

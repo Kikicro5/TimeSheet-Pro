@@ -1,4 +1,4 @@
-export type Job = 'job1' | 'job2';
+export type Job = 'job1';
 
 export interface TimeEntry {
   id: string;

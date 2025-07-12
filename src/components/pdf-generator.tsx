@@ -25,7 +25,6 @@ interface PdfGeneratorProps {
 
 const jobColors: Record<Job, string> = {
     job1: '#e0f2fe', // blue-100
-    job2: '#dcfce7', // green-100
 };
 
 export const PdfGenerator = forwardRef<unknown, PdfGeneratorProps>(({
@@ -75,7 +74,7 @@ export const PdfGenerator = forwardRef<unknown, PdfGeneratorProps>(({
     handleExportPDF: async () => {
       const pdf = await generatePdfInstance();
       if (pdf) {
-        pdf.save(`stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}${job ? `_${t[job].replace(' ', '_')}` : ''}.pdf`);
+        pdf.save(`stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`);
       }
     },
     handleShare: async () => {
@@ -87,7 +86,7 @@ export const PdfGenerator = forwardRef<unknown, PdfGeneratorProps>(({
       const pdf = await generatePdfInstance();
       if (!pdf) return;
 
-      const pdfFileName = `stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}${job ? `_${t[job].replace(' ', '_')}` : ''}.pdf`;
+      const pdfFileName = `stundenzettel_${userName.replace(' ','_')}_${monthName.replace(' ','_')}.pdf`;
 
       try {
           const pdfBlob = pdf.output('blob');
@@ -113,8 +112,7 @@ export const PdfGenerator = forwardRef<unknown, PdfGeneratorProps>(({
     }
   }));
 
-  const jobTitle = job ? t[job] : '';
-  const title = `${t.timeSheetFor} ${monthName} ${jobTitle ? `- ${jobTitle}` : ''}`
+  const title = `${t.timeSheetFor} ${monthName}`
 
   return (
     <div ref={pdfRef} style={{ display: 'none', width: '210mm', minHeight: '297mm', padding: '10mm' }} className="bg-white text-black text-xs">

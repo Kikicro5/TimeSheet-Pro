@@ -42,7 +42,6 @@ export const translations = {
     pleaseSelectDate: 'Bitte wählen Sie ein Datum aus.',
     job: 'Job',
     job1: 'Job 1',
-    job2: 'Job 2',
 
     // Timesheet List
     loggedEntries: 'Protokollierte Einträge',
@@ -134,7 +133,6 @@ export const translations = {
     pleaseSelectDate: 'Please select a date.',
     job: 'Job',
     job1: 'Job 1',
-    job2: 'Job 2',
 
     // Timesheet List
     loggedEntries: 'Logged Entries',

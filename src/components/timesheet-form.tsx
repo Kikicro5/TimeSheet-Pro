@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -8,16 +8,14 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Calendar as CalendarIcon, Clock, Coffee, MapPin, Plane, PartyPopper, User } from 'lucide-react';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
-import type { Job } from '@/types';
 
 const formSchema = z.object({
   userName: z.string().min(1, 'Ime i prezime je obavezno.'),
@@ -26,7 +24,7 @@ const formSchema = z.object({
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:mm)'),
   pause: z.coerce.number().min(0, 'Pause cannot be negative.'),
   location: z.string().min(1, 'Location is required.'),
-  job: z.enum(['job1', 'job2'], { required_error: "You need to select a job." }),
+  job: z.literal('job1', { required_error: "You need to select a job." }),
 });
 
 type TimesheetFormValues = z.infer<typeof formSchema>;
@@ -36,17 +34,6 @@ interface TimesheetFormProps {
   userName: string;
   setUserName: (name: string) => void;
 }
-
-const jobColors: Record<Job, string> = {
-    job1: 'bg-blue-100 hover:bg-blue-200 border-blue-200',
-    job2: 'bg-green-100 hover:bg-green-200 border-green-200',
-};
-
-const jobTextColors: Record<Job, string> = {
-    job1: 'text-blue-800',
-    job2: 'text-green-800',
-};
-
 
 export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetFormProps) {
   const { toast } = useToast();
@@ -76,7 +63,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
     addEntry(entryData);
     toast({
         title: t.entryAdded,
-        description: `${t.workOn} ${format(data.date, 'PPP')} ${t.for} ${t[data.job]} ${t.hasBeenLogged}.`,
+        description: `${t.workOn} ${format(data.date, 'PPP')} ${t.hasBeenLogged}.`,
     })
     form.reset({
         ...data,
@@ -139,46 +126,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="job"
-              render={({ field }) => (
-                <FormItem className="sm:col-span-2 lg:col-span-3">
-                  <FormLabel>{t.job}</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="grid grid-cols-2 gap-4"
-                    >
-                      {(['job1', 'job2'] as Job[]).map((job) => (
-                          <FormItem key={job} className="flex-1">
-                            <FormControl>
-                              <RadioGroupItem value={job} className="sr-only" />
-                            </FormControl>
-                            <FormLabel className={cn(
-                                "flex flex-col items-center justify-center rounded-md border-2 p-4 font-normal cursor-pointer transition-colors",
-                                field.value === job ? "border-primary" : "border-transparent",
-                                jobColors[job],
-                                jobTextColors[job]
-                            )}>
-                              <div className="flex items-center justify-center gap-2">
-                                <span className={cn(
-                                    "h-3 w-3 rounded-full transition-colors",
-                                    field.value === job ? 'bg-green-500' : 'bg-gray-300'
-                                )}></span>
-                                {t[job]}
-                              </div>
-                            </FormLabel>
-                          </FormItem>
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
+             <FormField
               control={form.control}
               name="date"
               render={({ field }) => (

@@ -2,10 +2,10 @@
 'use client';
 
 import { useState, useMemo, useEffect, useContext } from 'react';
-import type { TimeEntry, OvertimeOption, Job } from '@/types';
+import type { TimeEntry, OvertimeOption } from '@/types';
 import { TimesheetForm } from '@/components/timesheet-form';
 import { TimesheetList } from '@/components/timesheet-list';
-import { PiggyBank, History, Briefcase } from 'lucide-react';
+import { PiggyBank, History, Briefcase, RotateCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
@@ -57,12 +68,12 @@ export default function Home() {
   }, [entries, overtimeOption, userName, isClient]);
   
   const addEntry = (entry: Omit<TimeEntry, 'id' | 'totalHours' | 'overtimeHours'>) => {
-    const dateExists = entries.some(e => new Date(e.date).toDateString() === new Date(entry.date).toDateString() && e.job === entry.job);
+    const dateExists = entries.some(e => new Date(e.date).toDateString() === new Date(entry.date).toDateString());
     if (dateExists) {
         toast({
             variant: 'destructive',
             title: t.error,
-            description: `${t.entryExistsError} ${format(entry.date, 'dd.MM.yyyy')} for ${t[entry.job]}.`,
+            description: `${t.entryExistsError} ${format(entry.date, 'dd.MM.yyyy')}.`,
         });
         return;
     }

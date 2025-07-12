@@ -72,12 +72,6 @@ export default function HistoryPage() {
     pdfGeneratorRefs.current[id]?.handleShare();
   };
 
-  const getJobBadgeVariant = (job?: Job): "default" | "secondary" => {
-    if (job === 'job1') return 'default';
-    if (job === 'job2') return 'secondary';
-    return 'default';
-  }
-
   if (!isClient) {
     return null; // or a loading skeleton
   }
@@ -120,12 +114,8 @@ export default function HistoryPage() {
                     <TableRow key={entry.id}>
                       <TableCell className="font-medium">{format(new Date(entry.downloadDate), 'LLLL yyyy', { locale })}</TableCell>
                        <TableCell>
-                        {entry.job ? (
-                           <Badge variant={getJobBadgeVariant(entry.job)}>{t[entry.job]}</Badge>
-                        ) : (
-                          <Badge variant="outline">Svi</Badge>
-                        )}
-                      </TableCell>
+                         <Badge variant='default'>{t.job1}</Badge>
+                       </TableCell>
                       <TableCell>{format(entry.downloadDate, `dd.MM.yyyy '${language === 'de' ? 'um' : 'at'}' HH:mm`, { locale })}</TableCell>
                        <TableCell className="text-right">
                           <Button variant="ghost" size="icon" onClick={() => handleExport(entry.id)} className="text-muted-foreground hover:text-primary">

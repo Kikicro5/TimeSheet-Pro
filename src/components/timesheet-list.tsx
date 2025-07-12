@@ -158,7 +158,6 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
           <TableHeader>
             <TableRow>
               <TableHead>{t.date}</TableHead>
-              <TableHead>{t.job}</TableHead>
               <TableHead>{t.startTime}</TableHead>
               <TableHead>{t.endTime}</TableHead>
               <TableHead>{t.pause}</TableHead>
@@ -188,7 +187,6 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
               return (
               <TableRow key={entry.id} className={cn('animate-in fade-in-25', rowClass)}>
                 <TableCell className="font-medium">{format(new Date(entry.date), 'dd.MM.yyyy')}</TableCell>
-                <TableCell className="font-semibold">{entry.isVacation || entry.isHoliday ? '-' : t[entry.job]}</TableCell>
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.startTime}</TableCell>
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.endTime}</TableCell>
                 <TableCell>{entry.isVacation || entry.isHoliday ? '-' : `${entry.pause} min`}</TableCell>

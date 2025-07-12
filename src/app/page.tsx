@@ -48,7 +48,7 @@ export default function Home() {
       setOvertimeOption(savedOvertimeOption);
     }
     const savedUserName = localStorage.getItem('user-name');
-    if (savedUserName) {
+    if (savedUserName && savedUserName !== 'John Doe') {
       setUserName(savedUserName);
     }
     const savedCarryOverVacation = localStorage.getItem('carry-over-vacation');

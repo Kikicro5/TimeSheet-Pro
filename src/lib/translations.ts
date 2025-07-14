@@ -19,7 +19,7 @@ export const translations = {
     fillInWorkDetails: 'Füllen Sie Ihre Arbeitsdetails für den Tag aus.',
     nameAndSurname: 'Vor- und Nachname',
     namePlaceholder: 'z.B. Max Mustermann',
-    date: 'Datum',
+    date: 'Tag',
     pickADate: 'Wählen Sie ein Datum',
     startTime: 'Startzeit',
     endTime: 'Endzeit',
@@ -79,7 +79,7 @@ export const translations = {
     noDownloadsYet: 'Sie haben noch keine Listen heruntergeladen.',
 
     // PDF Generator
-    dayPdf: 'Dan',
+    dayPdf: 'Tag',
     pausePdf: 'Pause (min)',
     workHours: 'Arbeitsstunden',
     sharingNotSupported: 'Teilen wird in diesem Browser nicht unterstützt.',
@@ -114,7 +114,7 @@ export const translations = {
     fillInWorkDetails: 'Fill in your work details for the day.',
     nameAndSurname: 'First and Last Name',
     namePlaceholder: 'e.g. John Doe',
-    date: 'Date',
+    date: 'Day',
     pickADate: 'Pick a date',
     startTime: 'Start Time',
     endTime: 'End Time',

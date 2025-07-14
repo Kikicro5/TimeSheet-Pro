@@ -112,7 +112,7 @@ export const PdfGenerator = forwardRef<unknown, PdfGeneratorProps>(({
     }
   }));
 
-  const title = `${t.timeSheetFor} ${monthName}`
+  const title = monthName;
 
   return (
     <div ref={pdfRef} style={{ display: 'none', width: '210mm', minHeight: '297mm', padding: '10mm' }} className="bg-white text-black text-xs">

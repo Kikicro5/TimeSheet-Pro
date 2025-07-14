@@ -45,6 +45,7 @@ export const translations: { [key: string]: TranslationSet } = {
     holiday: 'Feiertag',
     entryExistsError: 'Eintrag für Datum existiert bereits:',
     pleaseSelectDate: 'Bitte wählen Sie ein Datum aus.',
+    nameRequired: 'Name ist erforderlich.',
     job: 'Job',
     job1: 'Job 1',
 
@@ -139,6 +140,7 @@ export const translations: { [key: string]: TranslationSet } = {
     holiday: 'Holiday',
     entryExistsError: 'Entry for date already exists:',
     pleaseSelectDate: 'Please select a date.',
+    nameRequired: 'Name is required.',
     job: 'Job',
     job1: 'Job 1',
 

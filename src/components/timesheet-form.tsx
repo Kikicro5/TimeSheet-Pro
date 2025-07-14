@@ -19,8 +19,8 @@ import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
 import Link from 'next/link';
 
-const formSchema = z.object({
-  userName: z.string().min(1, 'Ime i prezime je obavezno.'),
+const createFormSchema = (t: (key: string) => string) => z.object({
+  userName: z.string().min(1, t('nameRequired')),
   date: z.date({ required_error: 'A date is required.' }),
   startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:mm)'),
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:mm)'),
@@ -29,10 +29,9 @@ const formSchema = z.object({
   job: z.literal('job1', { required_error: "You need to select a job." }),
 });
 
-type TimesheetFormValues = z.infer<typeof formSchema>;
 
 interface TimesheetFormProps {
-  addEntry: (data: Omit<TimesheetFormValues, 'userName'> & { isVacation?: boolean; isHoliday?: boolean }) => void;
+  addEntry: (data: Omit<z.infer<ReturnType<typeof createFormSchema>>, 'userName'> & { isVacation?: boolean; isHoliday?: boolean }) => void;
   userName: string;
   setUserName: (name: string) => void;
 }
@@ -40,7 +39,10 @@ interface TimesheetFormProps {
 export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetFormProps) {
   const { toast } = useToast();
   const { language } = useContext(LanguageContext);
-  const t = translations[language];
+  const t = (key: string) => translations[language][key] as string;
+
+  const formSchema = createFormSchema(t);
+  type TimesheetFormValues = z.infer<typeof formSchema>;
 
   const form = useForm<TimesheetFormValues>({
     resolver: zodResolver(formSchema),
@@ -64,8 +66,8 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
     setUserName(userName);
     addEntry(entryData);
     toast({
-        title: t.entryAdded,
-        description: `${t.workOn} ${format(data.date, 'PPP')} ${t.hasBeenLogged}.`,
+        title: t('entryAdded'),
+        description: `${t('workOn')} ${format(data.date, 'PPP')} ${t('hasBeenLogged')}.`,
     })
     form.reset({
         ...data,
@@ -81,8 +83,13 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
 
   const handleAddSpecialDay = (isVacation: boolean) => {
     const { date, userName, job } = form.getValues();
+    if (!userName) {
+        toast({ variant: 'destructive', title: t('error'), description: t('nameRequired') });
+        form.trigger('userName');
+        return;
+    }
     if (!date) {
-        toast({ variant: 'destructive', title: t.error, description: t.pleaseSelectDate });
+        toast({ variant: 'destructive', title: t('error'), description: t('pleaseSelectDate') });
         return;
     }
      setUserName(userName);
@@ -97,8 +104,8 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
         isHoliday: !isVacation
     });
     toast({
-        title: isVacation ? t.vacationAdded : t.holidayAdded,
-        description: `${t.day} ${format(date, 'PPP')} ${t.hasBeenLoggedAs} ${isVacation ? t.vacation.toLowerCase() : t.holiday.toLowerCase()}.`,
+        title: isVacation ? t('vacationAdded') : t('holidayAdded'),
+        description: `${t('day')} ${format(date, 'PPP')} ${t('hasBeenLoggedAs')} ${isVacation ? t('vacation').toLowerCase() : t('holiday').toLowerCase()}.`,
     });
   }
 
@@ -106,13 +113,13 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
     <Card className="w-full shadow-lg animate-in fade-in-50">
       <CardHeader className="flex-row justify-between items-center">
         <div>
-          <CardTitle className="text-2xl font-headline">{t.newTimeEntry}</CardTitle>
-          <CardDescription>{t.fillInWorkDetails}</CardDescription>
+          <CardTitle className="text-2xl font-headline">{t('newTimeEntry')}</CardTitle>
+          <CardDescription>{t('fillInWorkDetails')}</CardDescription>
         </div>
         <Button asChild variant="outline">
           <Link href="/history">
             <History className="mr-2 h-4 w-4" />
-            {t.history}
+            {t('history')}
           </Link>
         </Button>
       </CardHeader>
@@ -124,7 +131,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="userName"
               render={({ field }) => (
                 <FormItem className="sm:col-span-2 lg:col-span-3">
-                  <FormLabel>{t.nameAndSurname}</FormLabel>
+                  <FormLabel>{t('nameAndSurname')}</FormLabel>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -140,7 +147,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>{t.date}</FormLabel>
+                  <FormLabel>{t('date')}</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -152,7 +159,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {field.value ? format(field.value, 'PPP') : <span>{t.pickADate}</span>}
+                          {field.value ? format(field.value, 'PPP') : <span>{t('pickADate')}</span>}
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
@@ -169,7 +176,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="startTime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.startTime}</FormLabel>
+                  <FormLabel>{t('startTime')}</FormLabel>
                    <div className="relative">
                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -185,7 +192,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="endTime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.endTime}</FormLabel>
+                  <FormLabel>{t('endTime')}</FormLabel>
                   <div className="relative">
                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -201,7 +208,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="pause"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.pause}</FormLabel>
+                  <FormLabel>{t('pause')}</FormLabel>
                   <div className="relative">
                     <Coffee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -217,11 +224,11 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
               name="location"
               render={({ field }) => (
                 <FormItem className="lg:col-span-2">
-                  <FormLabel>{t.location}</FormLabel>
+                  <FormLabel>{t('location')}</FormLabel>
                   <div className="relative flex-grow">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
-                      <Input placeholder={t.locationPlaceholder} className="pl-10" {...field} />
+                      <Input placeholder={t('locationPlaceholder')} className="pl-10" {...field} />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -232,13 +239,13 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
           <CardFooter className="flex justify-end gap-2 flex-wrap">
              <Button type="button" variant="outline" onClick={() => handleAddSpecialDay(true)}>
                 <Plane className="mr-2 h-4 w-4"/>
-                {t.addVacation}
+                {t('addVacation')}
              </Button>
              <Button type="button" variant="outline" onClick={() => handleAddSpecialDay(false)}>
                 <PartyPopper className="mr-2 h-4 w-4"/>
-                {t.addHoliday}
+                {t('addHoliday')}
              </Button>
-             <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90">{t.saveEntry}</Button>
+             <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90">{t('saveEntry')}</Button>
           </CardFooter>
         </form>
       </Form>

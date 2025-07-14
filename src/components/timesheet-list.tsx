@@ -67,25 +67,6 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
       return entryDate.getMonth() === now.getMonth() && entryDate.getFullYear() === now.getFullYear();
     });
   }, [entries, now]);
-
-  const calculateSummaryForJob = (job: Job | null) => {
-    const targetEntries = monthlyEntries;
-    return targetEntries.reduce(
-      (acc, entry) => {
-        if (entry.isVacation) {
-            acc.vacationDays += 1;
-        } else if (entry.isHoliday) {
-            acc.holidayDays += 1;
-        } else {
-            acc.totalWorkHours += (entry.totalHours || 0);
-            acc.totalOvertime += (entry.overtimeHours || 0);
-            acc.totalPause += (entry.pause || 0);
-        }
-        return acc;
-      },
-      { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 }
-    );
-  }
   
   const addDownloadToHistory = () => {
     const newHistoryEntry: DownloadHistoryEntry = {
@@ -274,7 +255,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
         userName={userName}
         monthName={monthName}
         monthlyEntries={monthlyEntries}
-        monthlySummary={calculateSummaryForJob('job1')}
+        monthlySummary={monthlySummary}
         overtimeOption={overtimeOption}
         job='job1'
         tProp={t}

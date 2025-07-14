@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRef, forwardRef, useImperativeHandle, useContext } from 'react';
@@ -28,7 +29,7 @@ const jobColors: Record<Job, string> = {
     job1: '#e0f2fe', // blue-100
 };
 
-export const PdfGenerator = forwardRef<unknown, PdfGeneratorProps>(({
+export const PdfGenerator = forwardRef<any, PdfGeneratorProps>(({
   userName,
   monthName,
   monthlyEntries = [],

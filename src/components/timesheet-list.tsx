@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { PdfGenerator, PdfGeneratorHandles } from './pdf-generator';
+import { PdfGenerator } from './pdf-generator';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
 import { cn } from '@/lib/utils';
@@ -48,7 +48,7 @@ const jobRowColors: Record<Job, string> = {
 };
 
 export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, setOvertimeOption, monthlySummary }: TimesheetListProps) {
-  const pdfGeneratorRef = useRef<PdfGeneratorHandles | null>(null);
+  const pdfGeneratorRef = useRef<any>(null);
   const { language } = useContext(LanguageContext);
   const t = translations[language];
   const locale = locales[language] || enUS;
@@ -133,13 +133,13 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t.day}</TableHead>
-              <TableHead>{t.startTime}</TableHead>
-              <TableHead>{t.endTime}</TableHead>
-              <TableHead>{t.pause}</TableHead>
-              <TableHead>{t.location}</TableHead>
-              <TableHead className="text-right">{t.overtime}</TableHead>
-              <TableHead className="text-right w-[100px]">{t.actions}</TableHead>
+              <TableHead className="align-middle">{t.day}</TableHead>
+              <TableHead className="align-middle">{t.startTime}</TableHead>
+              <TableHead className="align-middle">{t.endTime}</TableHead>
+              <TableHead className="align-middle">{t.pause}</TableHead>
+              <TableHead className="align-middle">{t.location}</TableHead>
+              <TableHead className="text-right align-middle">{t.overtime}</TableHead>
+              <TableHead className="text-right w-[100px] align-middle">{t.actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -162,15 +162,15 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
 
               return (
               <TableRow key={entry.id} className={cn('animate-in fade-in-25', rowClass)}>
-                <TableCell className="font-medium">{format(new Date(entry.date), 'dd.MM.yyyy')}</TableCell>
-                <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.startTime}</TableCell>
-                <TableCell>{entry.isVacation || entry.isHoliday ? '-' : entry.endTime}</TableCell>
-                <TableCell>{entry.isVacation || entry.isHoliday ? '-' : `${entry.pause} min`}</TableCell>
-                <TableCell><div className="max-w-[150px] truncate">{getLocationText()}</div></TableCell>
-                <TableCell className={`text-right font-mono ${overtimeHours >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <TableCell className="font-medium align-middle">{format(new Date(entry.date), 'dd.MM.yyyy')}</TableCell>
+                <TableCell className="align-middle">{entry.isVacation || entry.isHoliday ? '-' : entry.startTime}</TableCell>
+                <TableCell className="align-middle">{entry.isVacation || entry.isHoliday ? '-' : entry.endTime}</TableCell>
+                <TableCell className="align-middle">{entry.isVacation || entry.isHoliday ? '-' : `${entry.pause} min`}</TableCell>
+                <TableCell className="align-middle"><div className="max-w-[150px] truncate">{getLocationText()}</div></TableCell>
+                <TableCell className={`text-right font-mono align-middle ${overtimeHours >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {entry.isVacation || entry.isHoliday ? '-' : overtimeHours.toFixed(2) + 'h'}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right align-middle">
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">

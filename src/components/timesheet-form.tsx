@@ -135,7 +135,7 @@ export function TimesheetForm({ addEntry, userName, setUserName }: TimesheetForm
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
-                      <Input placeholder="" className="pl-10" {...field} />
+                      <Input placeholder={t('namePlaceholder')} className="pl-10" {...field} />
                     </FormControl>
                   </div>
                   <FormMessage />

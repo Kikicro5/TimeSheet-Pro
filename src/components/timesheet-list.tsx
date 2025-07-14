@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useRef, useContext } from 'react';
@@ -7,7 +8,6 @@ import { TimeEntry, OvertimeOption, DownloadHistoryEntry, Job } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Trash2, CalendarDays, Share2, FileType2 } from 'lucide-react';
 import {
@@ -230,22 +230,24 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                 </div>
             </div>
           </div>
-          <div className="flex flex-col items-center mt-4">
-            <Label className="font-bold">{t.overtimeOption}:</Label>
-             <RadioGroup
-                value={overtimeOption}
-                onValueChange={(value: OvertimeOption) => setOvertimeOption(value)}
-                className="flex items-center gap-4 mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="payout" id="payout" />
-                <Label htmlFor="payout">{t.payout}</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="keep" id="keep" />
-                <Label htmlFor="keep">{t.keep}</Label>
-              </div>
-            </RadioGroup>
+          <div className="flex flex-col items-center mt-4 w-full">
+            <Label className="font-bold mb-2">{t.overtimeOption}:</Label>
+             <div className="flex items-center gap-4">
+                <Button
+                    variant={overtimeOption === 'payout' ? 'default' : 'outline'}
+                    onClick={() => setOvertimeOption('payout')}
+                    className="w-32"
+                >
+                    {t.payout}
+                </Button>
+                <Button
+                    variant={overtimeOption === 'keep' ? 'default' : 'outline'}
+                    onClick={() => setOvertimeOption('keep')}
+                    className="w-32"
+                >
+                    {t.keep}
+                </Button>
+            </div>
           </div>
       </CardFooter>
     </Card>

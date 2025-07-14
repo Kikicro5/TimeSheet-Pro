@@ -1,4 +1,8 @@
-export const translations = {
+export type TranslationSet = {
+  [key: string]: string | TranslationSet;
+};
+
+export const translations: { [key: string]: TranslationSet } = {
   de: {
     // General
     backToHome: 'Zurück zur Startseite',

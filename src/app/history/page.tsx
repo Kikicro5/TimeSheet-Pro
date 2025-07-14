@@ -198,6 +198,7 @@ export default function HistoryPage() {
           monthlySummary={entry.monthlySummary}
           overtimeOption={entry.overtimeOption}
           job={entry.job}
+          tProp={t}
         />
     ))}
     </>

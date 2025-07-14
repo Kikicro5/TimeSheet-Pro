@@ -277,6 +277,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
         monthlySummary={calculateSummaryForJob('job1')}
         overtimeOption={overtimeOption}
         job='job1'
+        tProp={t}
     />
     </>
   );

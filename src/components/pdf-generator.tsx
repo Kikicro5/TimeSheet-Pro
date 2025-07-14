@@ -6,7 +6,7 @@ import html2canvas from 'html2canvas';
 import { format } from 'date-fns';
 import { TimeEntry, OvertimeOption, Job } from '@/types';
 import { LanguageContext } from '@/contexts/LanguageContext';
-import { translations } from '@/lib/translations';
+import { translations, TranslationSet } from '@/lib/translations';
 
 interface PdfGeneratorProps {
   userName: string;
@@ -21,6 +21,7 @@ interface PdfGeneratorProps {
   };
   overtimeOption: OvertimeOption;
   job?: Job;
+  tProp?: TranslationSet;
 }
 
 const jobColors: Record<Job, string> = {
@@ -34,10 +35,11 @@ export const PdfGenerator = forwardRef<unknown, PdfGeneratorProps>(({
   monthlySummary = { totalWorkHours: 0, totalOvertime: 0, totalPause: 0, vacationDays: 0, holidayDays: 0 },
   overtimeOption,
   job,
+  tProp
 }, ref) => {
   const pdfRef = useRef<HTMLDivElement>(null);
   const { language } = useContext(LanguageContext);
-  const t = translations[language];
+  const t = tProp || translations[language];
 
   const generatePdfInstance = async () => {
       const input = pdfRef.current;

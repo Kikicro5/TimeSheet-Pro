@@ -157,7 +157,7 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t.date}</TableHead>
+              <TableHead>{t.day}</TableHead>
               <TableHead>{t.startTime}</TableHead>
               <TableHead>{t.endTime}</TableHead>
               <TableHead>{t.pause}</TableHead>

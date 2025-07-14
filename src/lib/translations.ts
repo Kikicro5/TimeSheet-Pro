@@ -10,6 +10,7 @@ export const translations = {
     areYouSure: 'Sind Sie sicher?',
     error: 'Fehler',
     total: 'Gesamt',
+    day: 'Tag',
     
     // Home Page
     overtime: 'Überstunden',
@@ -19,7 +20,7 @@ export const translations = {
     fillInWorkDetails: 'Füllen Sie Ihre Arbeitsdetails für den Tag aus.',
     nameAndSurname: 'Vor- und Nachname',
     namePlaceholder: 'z.B. Max Mustermann',
-    date: 'Tag',
+    date: 'Datum',
     pickADate: 'Wählen Sie ein Datum',
     startTime: 'Startzeit',
     endTime: 'Endzeit',
@@ -35,7 +36,6 @@ export const translations = {
     hasBeenLogged: 'wurde protokolliert',
     vacationAdded: 'Urlaub hinzugefügt',
     holidayAdded: 'Feiertag hinzugefügt',
-    day: 'Tag',
     hasBeenLoggedAs: 'wurde als',
     vacation: 'Urlaub',
     holiday: 'Feiertag',
@@ -79,7 +79,6 @@ export const translations = {
     noDownloadsYet: 'Sie haben noch keine Listen heruntergeladen.',
 
     // PDF Generator
-    dayPdf: 'Tag',
     pausePdf: 'Pause (min)',
     workHours: 'Arbeitsstunden',
     sharingNotSupported: 'Teilen wird in diesem Browser nicht unterstützt.',
@@ -105,6 +104,7 @@ export const translations = {
     areYouSure: 'Are you sure?',
     error: 'Error',
     total: 'Total',
+    day: 'Day',
     
     // Home Page
     overtime: 'Overtime',
@@ -114,7 +114,7 @@ export const translations = {
     fillInWorkDetails: 'Fill in your work details for the day.',
     nameAndSurname: 'First and Last Name',
     namePlaceholder: 'e.g. John Doe',
-    date: 'Day',
+    date: 'Date',
     pickADate: 'Pick a date',
     startTime: 'Start Time',
     endTime: 'End Time',
@@ -130,7 +130,6 @@ export const translations = {
     hasBeenLogged: 'has been logged',
     vacationAdded: 'Vacation Added',
     holidayAdded: 'Holiday Added',
-    day: 'Day',
     hasBeenLoggedAs: 'has been logged as',
     vacation: 'Vacation',
     holiday: 'Holiday',
@@ -175,7 +174,6 @@ export const translations = {
     noDownloadsYet: 'You have not downloaded any sheets yet.',
 
     // PDF Generator
-    dayPdf: 'Day',
     pausePdf: 'Pause (min)',
     workHours: 'Work Hours',
     sharingNotSupported: 'Sharing is not supported on this browser.',

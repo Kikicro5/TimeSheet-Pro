@@ -23,7 +23,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AdBanner } from '@/components/ad-banner';
-import Image from 'next/image';
 
 export default function Home() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
@@ -209,7 +208,6 @@ export default function Home() {
       <header className="bg-primary text-primary-foreground shadow-md">
         <div className="w-full px-4 sm:container sm:mx-auto sm:px-6 lg:px-8 py-4 flex justify-between items-center gap-2">
           <div className="flex items-center gap-2">
-            <Image src="/icon.png" alt="TimeSheet Pro icon" width={24} height={24} />
             <h1 className="text-xl sm:text-2xl font-bold font-headline whitespace-nowrap">TimeSheet Pro</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">

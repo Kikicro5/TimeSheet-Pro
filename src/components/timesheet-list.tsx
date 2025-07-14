@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { PdfGenerator } from './pdf-generator';
+import { PdfGenerator, PdfGeneratorHandles } from './pdf-generator';
 import { LanguageContext } from '@/contexts/LanguageContext';
 import { translations } from '@/lib/translations';
 import { cn } from '@/lib/utils';
@@ -39,11 +39,6 @@ interface TimesheetListProps {
     vacationDays: number;
     holidayDays: number;
   };
-}
-
-interface PdfGeneratorHandles {
-  handleExportPDF: () => void;
-  handleShare: () => void;
 }
 
 const locales: { [key: string]: Locale } = { de, en: enUS };
@@ -236,14 +231,14 @@ export function TimesheetList({ entries, deleteEntry, userName, overtimeOption, 
                 <Button
                     variant={overtimeOption === 'payout' ? 'default' : 'outline'}
                     onClick={() => setOvertimeOption('payout')}
-                    className="w-32"
+                    className={cn("w-32", overtimeOption === 'payout' && 'bg-green-600 hover:bg-green-700 text-white')}
                 >
                     {t.payout}
                 </Button>
                 <Button
                     variant={overtimeOption === 'keep' ? 'default' : 'outline'}
                     onClick={() => setOvertimeOption('keep')}
-                    className="w-32"
+                    className={cn("w-32", overtimeOption === 'keep' && 'bg-green-600 hover:bg-green-700 text-white')}
                 >
                     {t.keep}
                 </Button>

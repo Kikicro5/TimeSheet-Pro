@@ -123,7 +123,7 @@ export const PdfGenerator = forwardRef<unknown, PdfGeneratorProps>(({
       <table className="w-full text-xs border-collapse border border-gray-400">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border border-gray-300 p-1 align-middle">{t.date}</th>
+            <th className="border border-gray-300 p-1 align-middle">{t.dayPdf}</th>
             <th className="border border-gray-300 p-1 align-middle">{t.job}</th>
             <th className="border border-gray-300 p-1 align-middle">{t.startTime}</th>
             <th className="border border-gray-300 p-1 align-middle">{t.endTime}</th>

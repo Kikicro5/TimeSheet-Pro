@@ -79,6 +79,7 @@ export const translations = {
     noDownloadsYet: 'Sie haben noch keine Listen heruntergeladen.',
 
     // PDF Generator
+    dayPdf: 'Dan',
     pausePdf: 'Pause (min)',
     workHours: 'Arbeitsstunden',
     sharingNotSupported: 'Teilen wird in diesem Browser nicht unterstützt.',
@@ -174,6 +175,7 @@ export const translations = {
     noDownloadsYet: 'You have not downloaded any sheets yet.',
 
     // PDF Generator
+    dayPdf: 'Day',
     pausePdf: 'Pause (min)',
     workHours: 'Work Hours',
     sharingNotSupported: 'Sharing is not supported on this browser.',

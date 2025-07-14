@@ -1,11 +1,11 @@
 {
   "name": "TimeSheet Pro",
   "short_name": "TimeSheetPro",
-  "description": "An app for logging work hours.",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#34495E",
+  "description": "An app for logging work hours.",
+  "id": "tsp.timesheetpro",
   "icons": [
     {
       "src": "/icon.png",

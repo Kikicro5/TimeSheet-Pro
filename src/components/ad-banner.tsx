@@ -30,3 +30,5 @@ export const AdBanner = () => {
     </div>
   );
 };
+
+export default AdBanner;

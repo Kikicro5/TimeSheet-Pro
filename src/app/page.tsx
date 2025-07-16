@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect, useContext } from 'react';
 import type { TimeEntry, OvertimeOption } from '@/types';
 import { TimesheetForm } from '@/components/timesheet-form';
 import { TimesheetList } from '@/components/timesheet-list';
-import { PiggyBank, Briefcase } from 'lucide-react';
+import { PiggyBank } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
